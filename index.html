@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Plant TI 뉴스레터 매직 빌더 V52</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .ver { text-align: right; font-size: 12px; color: #aaa; margin-bottom: 5px; font-weight: bold; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; font-size: 28px; }
+        .section-title { color: #FF8C00; border-bottom: 2px solid #FF8C00; padding-bottom: 8px; margin-top: 30px; font-weight: bold; }
+        
+        #dropzone {
+            width: 100%; min-height: 150px; border: 3px dashed #FF8C00; border-radius: 10px;
+            padding: 15px; box-sizing: border-box; background-color: #fffaf0; font-size: 14px; margin-bottom: 15px;
+            white-space: pre-wrap; 
+        }
+
+        .article-select-item { 
+            display: flex; align-items: center; gap: 15px; padding: 12px 15px; 
+            background: #fff; border: 1px solid #e1e8ed; border-radius: 8px; margin-bottom: 8px; 
+        }
+        .article-select-item input[type="checkbox"] { width: 22px; height: 22px; flex-shrink: 0; cursor: pointer; }
+        .title-text { flex: 1; font-weight: bold; font-size: 15px; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .image-drop-mini {
+            width: 110px; height: 65px; border: 2px dashed #2c3e50; background: #f8f9fa;
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; flex-shrink: 0;
+        }
+        .image-drop-mini img { max-width: 100%; max-height: 100%; }
+
+        #final-section { display: none; margin-top: 40px; }
+        .size-control-card { background: #f8f9fa; border-left: 5px solid #FF8C00; padding: 12px 15px; margin-bottom: 8px; border-radius: 4px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        button.primary-btn {
+            display: block; width: 100%; background: #2c3e50; color: white; border: none;
+            padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s;
+        }
+        button.primary-btn:hover { background: #1a252f; }
+        .btn-new-tab { background: #5d6d7e; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+        #outlook-result { background: white; border: 1px solid #e1e8ed; margin-top: 20px; padding: 0; }
+        .notice-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #ffeeba; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="ver">Version 52.0</div>
+    <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
+    
+    <h3 class="section-title">Step 1. 기사 입력 및 제목 선택</h3>
+    <div id="dropzone" contenteditable="true" placeholder="Gems 기사를 여기에 붙여넣으세요"></div>
+    <button class="primary-btn" onclick="parseArticles()">1단계: 분석 및 제목 리스트 생성 🔍</button>
+    
+    <div id="selection-area" style="display:none; margin-top:20px;">
+        <div id="selection-list"></div>
+        <button class="primary-btn" style="background:#FF8C00;" onclick="generateFinal()">2단계: 최종 뉴스레터 생성 및 크기 조절 📋</button>
+    </div>
+
+    <div id="final-section">
+        <h3 class="section-title" style="color:#2c3e50; border-color:#2c3e50;">Step 2. 최종 결과물 (사진 크기 및 비율 조절)</h3>
+        <div id="size-controls"></div>
+        <div id="outlook-result"></div>
+        
+        <div style="margin-top:30px;">
+            <div class="notice-box">
+                💡 <b>3단계 아웃룩 복사 필독:</b><br>
+                아웃룩 본문에 붙여넣으신 후, [붙여넣기 옵션]에서 <b>'원문 서식 유지(K)'</b>를 반드시 클릭하세요. 그래야 네이비 버튼과 오렌지 제목, 그림 옆 여백이 완벽하게 유지됩니다.
+            </div>
+            <button class="primary-btn" style="background:#27ae60;" onclick="copyToClipboard()">3단계 아웃룩 본문으로 복사하기 ✨</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let articles = [];
+
+    // 붙여넣기 시 클린 텍스트 유지
+    document.getElementById('dropzone').addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+        selection.deleteFromDocument();
+        const textNode = document.createTextNode(text);
+        selection.getRangeAt(0).insertNode(textNode);
+        selection.collapseToEnd();
+    });
+
+    function cleanUrl(url) {
+        if (!url) return "#";
+        return url.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\[|\]|\s]+$/, "").trim();
+    }
+
+    function openNewWindow(url) {
+        const cleanedUrl = cleanUrl(url);
+        const width = 1100;
+        const height = 850;
+        // 💡 강제 새 창 열기 (스펙 명시)
+        window.open(cleanedUrl, '_blank', `width=${width},height=${height},resizable=yes,scrollbars=yes,status=yes`);
+    }
+
+    function parseArticles() {
+        const dropzone = document.getElementById('dropzone');
+        const rawText = dropzone.innerText || dropzone.textContent;
+        const blocks = rawText.split(/기사\s*\d+\./);
+        articles = [];
+
+        for (let i = 1; i < blocks.length; i++) {
+            let block = blocks[i].trim();
+            let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let firstLine = lines[0] || "제목 없음";
+            
+            // 제목 괄호 제거 및 정제
+            let cleanTitle = firstLine.replace(/^(제목\s*[:：]\s*)/i, "").replace(/[\[\]]/g, "").trim();
+            
+            let dateMatch = block.match(/(\d{1,2}월\s*\d{1,2}일)/);
+            let date = dateMatch ? `[${dateMatch[0]}]` : "";
+            
+            let url = "#";
+            let urlMatch = block.match(/https?:\/\/[^\s\]<>"]+/);
+            if (urlMatch) url = cleanUrl(urlMatch[0]);
+
+            let contentLines = lines.slice(1);
+            let contentText = contentLines.join('\n');
+            
+            const garbagePatterns = [
+                /기사\s*날짜\s*[:：][^\n]*/gi,
+                /\d*\)?\s*기사\s*출처\s*[:：][\s\S]*/gi,
+                /\d*\)?\s*원본\s*기사\s*[:：][\s\S]*/gi,
+                /\d*\)?\s*(사진|이미지)\s*(주소|출처)?\s*[:：][\s\S]*/gi,
+                /비고\s*[:：][\s\S]*/gi,
+                /교차\s*검증[\s\S]*/gi
+            ];
+            garbagePatterns.forEach(p => contentText = contentText.replace(p, ""));
+
+            // 본문 대괄호 [ ] 볼드 처리
+            let contentHtml = contentText.split('\n')
+                .filter(line => line.trim().length > 0)
+                .map(line => {
+                    let formattedLine = line.replace(/(\[.*?\])/g, "<b>$1</b>");
+                    return `<p style="margin:0 0 10px 0; font-family:'맑은 고딕',sans-serif; font-size:15px; color:#333333; line-height:1.7;">${formattedLine}</p>`;
+                })
+                .join('');
+
+            articles.push({
+                title: cleanTitle, date: date, url: url, contentHtml: contentHtml, imgData: "", selected: true, imgWidth: 320
+            });
+        }
+        renderSelection();
+    }
+
+    function renderSelection() {
+        const list = document.getElementById('selection-list');
+        list.innerHTML = '';
+        articles.forEach((art, idx) => {
+            const item = document.createElement('div');
+            item.className = 'article-select-item';
+            item.innerHTML = `
+                <input type="checkbox" checked onchange="articles[${idx}].selected = this.checked">
+                <div class="title-text">${idx+1}. ${art.title}</div>
+                <button class="btn-new-tab" onclick="openNewWindow('${art.url}')">기사 그림 가져오기 🔗</button>
+                <div class="image-drop-mini" id="drop_${idx}" ondragover="event.preventDefault();" ondrop="handleDrop(event, ${idx})">
+                    그림 던지기
+                </div>
+            `;
+            list.appendChild(item);
+        });
+        document.getElementById('selection-area').style.display = 'block';
+    }
+
+    async function handleDrop(e, idx) {
+        e.preventDefault();
+        const html = e.dataTransfer.getData('text/html');
+        const match = html.match(/src=["']([^"']+)["']/);
+        if (match && match[1]) {
+            const data = await fetchBase64(match[1]);
+            if (data) setImage(idx, data);
+        } else if (e.dataTransfer.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (ev) => setImage(idx, ev.target.result);
+            reader.readAsDataURL(e.dataTransfer.files[0]);
+        }
+    }
+
+    function setImage(idx, data) {
+        articles[idx].imgData = data;
+        document.getElementById(`drop_${idx}`).innerHTML = `<img src="${data}">`;
+    }
+
+    function generateFinal() {
+        const result = document.getElementById('outlook-result');
+        const controls = document.getElementById('size-controls');
+        controls.innerHTML = '';
+        
+        let html = `<table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif; max-width:850px; margin:0 auto; background-color:#ffffff; border-collapse:collapse;"><tr><td>`;
+        
+        let displayIdx = 0;
+        articles.forEach((art, idx) => {
+            if (!art.selected) return;
+            const align = displayIdx % 2 === 0 ? "left" : "right";
+            
+            // 💡 수정 4: 기사 배경색 대비 강화 (화이트 vs 라이트 그레이블루)
+            const bgColor = displayIdx % 2 === 0 ? "#ffffff" : "#ebf0f3";
+            const borderColor = "#d1d8dd"; 
+            
+            controls.innerHTML += `
+                <div class="size-control-card">
+                    <strong style="color:#2c3e50; width:130px;">기사 ${displayIdx+1} 그림 크기:</strong> 
+                    <input type="range" min="150" max="600" value="${art.imgWidth}" oninput="updateSize(${idx}, this.value)" style="flex:1;">
+                    <span id="val_${idx}" style="font-weight:bold; width:60px; color:#FF8C00;">${art.imgWidth}px</span>
+                </div>`;
+
+            // 💡 수정 1: height 속성 제거로 직사각형 비율 유지
+            // 💡 수정 2: hspace="25"로 여백 확실히 확보
+            html += `
+            <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;">
+                <div style="margin-bottom:12px; display:block;">
+                    <span style="font-size:23px; font-weight:bold; color:#FF8C00; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span>
+                </div>
+                <div style="margin-bottom:20px; display:block;">
+                    <span style="font-size:14px; font-weight:bold; color:#7f8c8d; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span>
+                </div>
+                <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;">
+                    ${art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" align="${align}" hspace="25" vspace="10" border="0" style="display:inline-block; border-radius:10px; margin-${align === 'left' ? 'right' : 'left'}:20px;">` : ""}
+                    ${art.contentHtml}
+                    <div style="margin-top:35px; clear:both; text-align:center; display:block;">
+                        <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="#2c3e50" style="border-radius:6px; background-color:#2c3e50;">
+                            <a href="${art.url}" target="_blank" style="font-size:15px; font-weight:bold; color:#ffffff !important; text-decoration:none; padding:12px 35px; display:inline-block; font-family:'맑은 고딕',sans-serif; color:#ffffff;">
+                                <span style="color:#ffffff !important;">기사 원문 읽기 →</span>
+                            </a>
+                        </td></tr></table>
+                    </div>
+                </div>
+            </div>`;
+            displayIdx++;
+        });
+        html += `</td></tr></table>`;
+        result.innerHTML = html;
+        document.getElementById('final-section').style.display = 'block';
+    }
+
+    function updateSize(idx, val) {
+        articles[idx].imgWidth = val;
+        document.getElementById(`val_${idx}`).innerText = val + "px";
+        const img = document.getElementById(`final_img_${idx}`);
+        if(img) {
+            img.setAttribute('width', val); 
+            // 💡 세로 길이를 명시하지 않아야 직사각형 비율이 깨지지 않음
+            img.style.width = val + "px";
+            img.style.height = "auto";
+        }
+    }
+
+    function copyToClipboard() {
+        const range = document.createRange();
+        range.selectNodeContents(document.getElementById('outlook-result'));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        alert("✅ 아웃룩 최적화 디자인이 복사되었습니다! 아웃룩 본문에 붙여넣고 '원문 서식 유지'를 확인해 주세요.");
+    }
+
+    async function fetchBase64(url) {
+        try {
+            const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`;
+            const response = await fetch(proxyUrl);
+            const blob = await response.blob();
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        } catch (e) { return null; }
+    }
+</script>
+</body>
+</html>
