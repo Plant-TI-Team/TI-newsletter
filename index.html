@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V64</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -58,10 +58,10 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 64.0 (Smart Fallback Router)</div>
+    <div class="ver">Version 65.0 (Stable Natural Flow)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
-    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (독립 기억 장치 탑재) 🤖</h3>
+    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (자연어 엔진 안정화) 🤖</h3>
     <div class="ai-panel">
         <div class="ai-key-box">
             <span style="font-size: 13px; font-weight: bold; color: #333;">🔑 Gemini API Key:</span>
@@ -82,7 +82,7 @@
     </div>
     
     <h3 class="section-title">Step 1. 통합 기사 확인 및 정제 (최대 10개 표시창)</h3>
-    <div id="dropzone" contenteditable="true" placeholder="0단계의 복합 결과물 10개가 순서대로 이곳에 자동 통합 주입됩니다."></div>
+    <div id="dropzone" contenteditable="true" placeholder="결과물들이 순서대로 이곳에 자동 통합 주입됩니다."></div>
     <button class="primary-btn" onclick="parseArticles()">1단계: 통합 분석 및 제목 리스트 생성 🔍</button>
     
     <div id="selection-area" style="display:none; margin-top:20px;">
@@ -121,14 +121,14 @@
         if(savedTech) {
             document.getElementById('aiPromptTech').value = savedTech;
         } else {
-            document.getElementById('aiPromptTech').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 '신기술 및 신공법' 기사를 최대 5개(부족하면 1~2개도 가능) 선정하라. 부족할 경우 범위를 넓혀 타 공식 보도자료에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
+            document.getElementById('aiPromptTech').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 '신기술 및 신공법' 기사를 최대 5개(부족하면 1~2개도 가능) 선정하라. 만약 지정된 사이트에 기사가 없다면, 범위를 넓혀 IAEA, WNA, 각국 원자력청 공식 보도자료 및 글로벌 에너지 매체에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이트]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
         }
 
         const savedBiz = localStorage.getItem('plant_ti_gemini_prompt_biz');
         if(savedBiz) {
             document.getElementById('aiPromptBiz').value = savedBiz;
         } else {
-            document.getElementById('aiPromptBiz').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 '비즈니스 및 정책' 기사를 5개 선정하라. 부족할 경우 범위를 넓혀 타 공식 보도자료에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이트]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
+            document.getElementById('aiPromptBiz').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 '비즈니스 및 정책' 기사를 5개 선정하라. 만약 지정된 사이트에 기사가 없다면, 범위를 넓혀 IAEA, WNA, 각국 원자력청 공식 보도자료 및 글로벌 에너지 매체에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이트]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
         }
     }
 
@@ -138,7 +138,7 @@
         const promptBiz = document.getElementById('aiPromptBiz').value.trim();
         
         if(!apiKey) { alert("Gemini API Key를 입력해주세요."); return; }
-        if(!promptTech || !promptBiz) { alert("0-1단계와 0-2단계 가이드라인을 모두 입력해주세요."); return; }
+        if(!promptTech || !promptBiz) { alert("가이드라인을 입력해주세요."); return; }
         
         localStorage.setItem('plant_ti_gemini_key', apiKey);
         localStorage.setItem('plant_ti_gemini_prompt_tech', promptTech);
@@ -148,17 +148,17 @@
         btn.disabled = true;
         document.getElementById('dropzone').innerText = "";
 
-        // 💡 핵심 수정: 9개 사이트를 최우선으로 하되, 기사가 부족할 경우 다른 공식 전문 매체 검색을 허용하는 계율 밸런싱
+        // 💡 안정화 핵심: 구글 검색엔진 API가 튕기지 않도록 부드럽고 명확한 자연어 지침으로 롤백
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
+        반드시 구글 라이브 검색 기능을 활용해 최신 기사를 서칭하라.
         
-        ⚠️ [검색 우선순위 및 유연한 폴백(Fallback) 지침]
-        1. [1순위 최우선 검색]: 사용자가 제시한 아래 9개 도메인을 가장 먼저, 집중적으로 탐색하여 뉴스를 선별하라.
-           - iaea.org, world-nuclear.org, nei.org, world-nuclear-news.org, power-eng.com, inl.gov, nucnet.org, ans.org, neimagazine.com
-        2. [2순위 확장 검색]: 만약 지정된 9개 사이트에서 지난 2주 이내의 최신 기사나 조건에 맞는 본문 분량이 충족되지 않거나 부족한 경우에 한해서, 범위를 확장하여 IAEA, WNA, 각국 원자력청 공식 보도자료 및 공신력 있는 글로벌 에너지 전문 매체(구글 라이브 검색 활용)에서 관련 뉴스를 추가 발굴하여 보완하라.
-        3. 공신력 없는 일반 개인 블로그, 카페, 위키백과 등의 정보는 타 사이트 확장 시에도 철저히 배제하라.
+        [필수 검색 및 서칭 규칙]
+        1. 사용자가 가이드라인에 제공한 9개 도메인의 정보를 최우선적으로 검색하여 뉴스를 선별하라.
+        2. 만약 해당 9개 도메인에 조건(지난 2주 이내, 내용 분량 등)에 부합하는 기사가 부족하거나 없다면, 제한을 풀고 IAEA, WNA, 각국 원자력청 공식 보도자료 및 전 세계 공신력 있는 에너지/원자력 전문 언론사 및 뉴스 매체로 범위를 확장하여 기사를 수집하고 채워라.
+        3. 기사의 제목은 절대로 영어 원문 그대로 출력하지 마라. 핵심 내용을 파악하여 한국 독자가 읽기 편하도록 반드시 자연스럽고 가독성 좋은 한국어 제목으로 번역 및 의역하여 출력하라.
+        4. 기사 출처 URL은 절대로 임의로 지어내지 말고 검색 결과에 제공된 실제 주소를 그대로 복사 붙여넣기 하라. 주소 끝에 [1], [2] 같은 검색 각주 기호를 절대 붙이지 마라.
         
-        기사 출처 URL을 절대 상상해서 적지 말고 검색된 진짜 주소를 그대로 대소문자 구별해 복사 붙여넣기 하라. 주소 뒤에 [1], [2] 같은 각주 기호를 절대 붙이지 마라.
-        반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라.
+        반드시 아래 [포맷] 규격을 한 글자도 틀리지 말고 엄격히 준수하여 출력하고, 서론 없이 바로 '기사 1.'로 시작하라.
 
         [포맷]
         기사 1. [한국어로 번역된 기사 제목]
@@ -168,14 +168,14 @@
         기사 출처 : [순수 URL]`;
 
         try {
-            btn.innerText = "⏳ [1/2단계] 9개 사이트 기반 신공법 뉴스 서칭 중 (부족 시 공식 매체 확장)...";
-            const techText = await callGeminiAPI(apiKey, promptTech, systemInstructionCommon + "\n너는 원자력 '신기술 및 신공법' 관련 뉴스를 추출해야 한다.");
+            btn.innerText = "⏳ [1/2단계] 신공법 뉴스 수집 중 (9개 사이트 우선 ➡️ 부족 시 확장)...";
+            const techText = await callGeminiAPI(apiKey, promptTech, systemInstructionCommon + "\n너는 오직 원자력 '신기술 및 신공법' 관련 뉴스만 집중 수집해야 한다.");
             
             const techMatches = techText.match(/기사\s*\d+\./g) || [];
             const techCount = techMatches.length;
 
-            btn.innerText = `⏳ [2/2단계] 9개 사이트 기반 비즈니스 뉴스 서칭 중... (신공법 ${techCount}개 확보)`;
-            const bizText = await callGeminiAPI(apiKey, promptBiz, systemInstructionCommon + "\n너는 원자력 '비즈니스 및 정책' 관련 뉴스를 추출해야 한다.");
+            btn.innerText = `⏳ [2/2단계] 비즈니스 뉴스 수집 중... (앞서 신공법 ${techCount}개 확보)`;
+            const bizText = await callGeminiAPI(apiKey, promptBiz, systemInstructionCommon + "\n너는 오직 원자력 '비즈니스 및 정책' 관련 뉴스만 집중 수집해야 한다.");
 
             let processedBizText = bizText.replace(/기사\s*(\d+)\./g, function(match, num) {
                 return `기사 ${parseInt(num) + techCount}.`;
@@ -184,7 +184,7 @@
             const finalCombinedText = techText.trim() + "\n\n" + processedBizText.trim();
             document.getElementById('dropzone').innerText = finalCombinedText;
             
-            alert(`🤖 복합 정밀 검색 완료!\n조건에 부합하는 원고들이 1단계 창에 성공적으로 통합 주입되었습니다.`);
+            alert(`🤖 복합 정밀 검색 완료!\n조건에 부합하는 모든 원고들이 1단계 창에 깔끔한 한국어 제목으로 통합 주입되었습니다.`);
             parseArticles(); 
             
         } catch (e) {
