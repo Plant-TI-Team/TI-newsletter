@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V59</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V60</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -13,7 +13,7 @@
         .ai-panel { background: #f0f7ff; border: 1px solid #b3d7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
         .ai-key-box { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
         .ai-key-box input { flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; }
-        #aiPrompt { width: 100%; min-height: 120px; border: 1px solid #b3d7ff; border-radius: 6px; padding: 12px; box-sizing: border-box; font-size: 14px; resize: vertical; }
+        #aiPrompt { width: 100%; min-height: 150px; border: 1px solid #b3d7ff; border-radius: 6px; padding: 12px; box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.5; }
 
         .config-panel { background: #f8f9fa; border: 1px solid #e1e8ed; padding: 20px; border-radius: 10px; margin-top: 20px; display: flex; gap: 30px; align-items: center; }
         .config-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; color: #2c3e50; }
@@ -55,43 +55,16 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 59.0 (URL Cleaned & Image Drag Restored)</div>
+    <div class="ver">Version 60.0 (Full Auto-Save Engine)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
-    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 자동 생성 🤖</h3>
+    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 자동 생성 (개인별 가이드라인 무한 기억) 🤖</h3>
     <div class="ai-panel">
         <div class="ai-key-box">
             <span style="font-size: 13px; font-weight: bold; color: #333;">🔑 Gemini API Key:</span>
             <input type="password" id="apiKey" placeholder="Google AI Studio에서 발급받은 무료 API Key를 입력하세요">
         </div>
-        <textarea id="aiPrompt">아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 기사 3개를 선정하라.
-부족할 경우 IAEA, WNA, 각국 원자력청 공식 보도자료에서 보완하라.
-
-[필수 출력 규칙]
-1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.
-2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.
-
-[포맷]
-기사 1. [기사 제목]
-기사 날짜 : [MM월 DD일]
-
-[소제목]
--. [상세한 개조식 본문 문장]
-[소제목]
--. [상세한 개조식 본문 문장]
-
-기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]
-
-[검색 대상 사이트]
-https://www.iaea.org
-https://www.world-nuclear.org
-https://www.nei.org
-https://www.world-nuclear-news.org
-https://www.power-eng.com/nuclear
-https://www.inl.gov
-https://www.nucnet.org
-https://www.ans.org/news
-https://www.neimagazine.com</textarea>
+        <textarea id="aiPrompt" placeholder="여기에 기사 수집 가이드라인을 작성하세요. 입력 후 생성 버튼을 누르면 이 컴퓨터에 자동으로 영구 저장됩니다."></textarea>
         <button class="primary-btn" id="aiGenBtn" style="background:#00467F; margin-top:10px; font-size:16px; padding:12px;" onclick="generateAIArticles()">구글 라이브 검색 및 기사 생성 시작 📡</button>
     </div>
     
@@ -127,9 +100,18 @@ https://www.neimagazine.com</textarea>
 <script>
     let articles = [];
 
+    // 💡 변경 포인트 1: 페이지가 열릴 때 API 키와 가이드를 모두 메모리에서 자동 복구
     window.onload = function() {
         const savedKey = localStorage.getItem('plant_ti_gemini_key');
         if(savedKey) document.getElementById('apiKey').value = savedKey;
+
+        const savedPrompt = localStorage.getItem('plant_ti_gemini_prompt');
+        if(savedPrompt) {
+            document.getElementById('aiPrompt').value = savedPrompt;
+        } else {
+            // 저장된 기록이 없는 최초 접속자용 기본 가이드라인 셋팅
+            document.getElementById('aiPrompt').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 기사 3개를 선정하라.\n부족할 경우 IAEA, WNA, 각국 원자력청 공식 보도자료에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이트]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
+        }
     }
 
     async function generateAIArticles() {
@@ -139,7 +121,10 @@ https://www.neimagazine.com</textarea>
         if(!apiKey) { alert("Gemini API Key를 입력해주세요."); return; }
         if(!userPrompt) { alert("가이드라인을 입력해주세요."); return; }
         
+        // 💡 변경 포인트 2: 버튼을 누르는 순간 입력한 가이드와 키를 브라우저에 즉시 박제 저장
         localStorage.setItem('plant_ti_gemini_key', apiKey);
+        localStorage.setItem('plant_ti_gemini_prompt', userPrompt);
+        
         const btn = document.getElementById('aiGenBtn');
         btn.innerText = "웹 서칭 및 기사 요약 중... (약 15~30초 소요) 📡";
         btn.disabled = true;
@@ -203,10 +188,9 @@ https://www.neimagazine.com</textarea>
         selection.collapseToEnd();
     });
 
-    // 💡 주소 뒤에 붙은 각주 및 특수문자 제거 고도화 로직
     function cleanUrl(url) {
         if (!url) return "#";
-        let cleaned = url.split(/[\[\s\]]/)[0]; // [1] 이나 공백이 나오면 앞부분만 자름
+        let cleaned = url.split(/[\[\s\]]/)[0]; 
         return cleaned.trim();
     }
 
@@ -347,7 +331,6 @@ https://www.neimagazine.com</textarea>
         document.getElementById('final-section').style.display = 'block';
     }
 
-    // (하단 유틸리티 기능 동일)
     function updateSize(idx, val) {
         articles[idx].imgWidth = val;
         document.getElementById(`val_${idx}`).innerText = val + "px";
