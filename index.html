@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V58</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V59</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -55,22 +55,43 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 58.0 (Live Search grounded)</div>
+    <div class="ver">Version 59.0 (URL Cleaned & Image Drag Restored)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
-    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 자동 생성 (Live Google Search 연동) 🤖</h3>
+    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 자동 생성 🤖</h3>
     <div class="ai-panel">
         <div class="ai-key-box">
             <span style="font-size: 13px; font-weight: bold; color: #333;">🔑 Gemini API Key:</span>
             <input type="password" id="apiKey" placeholder="Google AI Studio에서 발급받은 무료 API Key를 입력하세요">
         </div>
-        <textarea id="aiPrompt">아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 기사 3개를 선정하라. (신기술/신공법, 비즈니스/정책 비율 조화롭게 유지)
+        <textarea id="aiPrompt">아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 기사 3개를 선정하라.
 부족할 경우 IAEA, WNA, 각국 원자력청 공식 보도자료에서 보완하라.
 
 [필수 출력 규칙]
-1. 모든 URL(기사 및 사진)은 마크다운 [제목](주소) 형식을 절대 사용하지 마라.
-2. 클릭 가능한 하이퍼링크가 아닌, 순수 텍스트 형태의 URL(http://...)로만 출력하라.
-3. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.</textarea>
+1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.
+2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.
+
+[포맷]
+기사 1. [기사 제목]
+기사 날짜 : [MM월 DD일]
+
+[소제목]
+-. [상세한 개조식 본문 문장]
+[소제목]
+-. [상세한 개조식 본문 문장]
+
+기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]
+
+[검색 대상 사이트]
+https://www.iaea.org
+https://www.world-nuclear.org
+https://www.nei.org
+https://www.world-nuclear-news.org
+https://www.power-eng.com/nuclear
+https://www.inl.gov
+https://www.nucnet.org
+https://www.ans.org/news
+https://www.neimagazine.com</textarea>
         <button class="primary-btn" id="aiGenBtn" style="background:#00467F; margin-top:10px; font-size:16px; padding:12px;" onclick="generateAIArticles()">구글 라이브 검색 및 기사 생성 시작 📡</button>
     </div>
     
@@ -81,7 +102,7 @@
     <div id="selection-area" style="display:none; margin-top:20px;">
         <div class="config-panel">
             <div class="config-item">🎨 기사 제목 색상: <input type="color" id="titleColor" value="#D35400"></div>
-            <div class="config-item">🔘 버튼 배경 색상: <input type="color" id="00467F" value="#00467F"></div>
+            <div class="config-item">🔘 버튼 배경 색상: <input type="color" id="btnColor" value="#00467F"></div>
             <div class="config-item">📝 버튼 글자 색상: <input type="color" id="btnTextColor" value="#D1D1D1"></div>
         </div>
         <div id="selection-list" style="margin-top:20px;"></div>
@@ -111,7 +132,6 @@
         if(savedKey) document.getElementById('apiKey').value = savedKey;
     }
 
-    // 💡 핵심 수정: 구글 라이브 검색(tools) 활성화 및 시스템 지침 정렬
     async function generateAIArticles() {
         const apiKey = document.getElementById('apiKey').value.trim();
         const userPrompt = document.getElementById('aiPrompt').value.trim();
@@ -121,14 +141,14 @@
         
         localStorage.setItem('plant_ti_gemini_key', apiKey);
         const btn = document.getElementById('aiGenBtn');
-        btn.innerText = "웹 서칭 및 기사 요약 중... (라이브 검색은 15~30초 소요됩니다) 📡";
+        btn.innerText = "웹 서칭 및 기사 요약 중... (약 15~30초 소요) 📡";
         btn.disabled = true;
 
         try {
-            // 사용자 정의 가이드라인 포맷과 시스템 지침 일치화
-            const systemInstruction = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 정교하게 돕는 전문 AI 비서다. 
-            반드시 사용자가 제공한 검색 대상 사이트들을 구글 라이브 검색 기능을 활용해 실시간으로 서칭하여 기사를 작성하라.
-            반드시 아래 명시된 [포맷] 규격을 한 글자도 틀리지 말고 엄격하게 준수하여 출력하라.
+            const systemInstruction = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
+            반드시 구글 라이브 검색 기능을 활용해 최신 기사를 서칭하라.
+            가짜 이미지 주소를 절대 지어내지 말고, 오직 기사 내용과 기사 출처 URL만 확보하라.
+            반드시 아래 명시된 [포맷] 규격을 엄격하게 준수하여 출력하라.
 
             [포맷]
             기사 1. [기사 제목]
@@ -139,11 +159,9 @@
             [소제목]
             -. [상세하고 길게 작성된 개조식 본문 문장]
 
-            기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 http로 시작하게 기입]
-            사진 주소 : [여기에 기사 대표 이미지의 직접적인 URL 기입]
-            비고 : [유료 사이트 여부 및 대체 링크 정보]
+            기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]
 
-            [⚠️ 절대 규칙]: 서론이나 백틱(\`\`\`) 기호 없이 바로 '기사 1.'로 시작하라. 기사 출처 및 사진 주소는 무조건 기사 본문 내용의 '최하단'에 위치해야 한다.`;
+            [⚠️ 절대 규칙]: 주소 뒤에 [1], [2] 같은 검색 출처 각주 기호를 절대 붙이지 말고 순수한 http 주소만 출력하라. 서론 없이 바로 '기사 1.'로 시작하라.`;
 
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
@@ -151,7 +169,6 @@
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: userPrompt }] }],
                     systemInstruction: { parts: [{ text: systemInstruction }] },
-                    // 💡 핵심: 구글 라이브 웹 검색 기능 강제 연동
                     tools: [{"googleSearch": {}}] 
                 })
             });
@@ -160,7 +177,6 @@
             if(!data.candidates) { throw new Error("API 응답 오류"); }
             
             const aiResultText = data.candidates[0].content.parts[0].text;
-            
             const dropzone = document.getElementById('dropzone');
             dropzone.innerText = aiResultText;
             
@@ -187,9 +203,11 @@
         selection.collapseToEnd();
     });
 
+    // 💡 주소 뒤에 붙은 각주 및 특수문자 제거 고도화 로직
     function cleanUrl(url) {
         if (!url) return "#";
-        return url.replace(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\[|\]|\s]+$/, "").trim();
+        let cleaned = url.split(/[\[\s\]]/)[0]; // [1] 이나 공백이 나오면 앞부분만 자름
+        return cleaned.trim();
     }
 
     function openNewWindow(url) {
@@ -197,7 +215,6 @@
         window.open(cleanedUrl, '_blank', `width=1100,height=850,resizable=yes,scrollbars=yes,status=yes`);
     }
 
-    // 💡 신규 포맷에 맞춘 기사 파서(Parser) 고도화
     function parseArticles() {
         const dropzone = document.getElementById('dropzone');
         const rawText = dropzone.innerText || dropzone.textContent;
@@ -208,15 +225,12 @@
             let block = blocks[i].trim();
             let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             
-            // 첫 번째 줄이 곧 제목이 됩니다.
             let firstLine = lines[0] || "제목 없음";
             let cleanTitle = firstLine.replace(/^(제목\s*[:：]\s*)/i, "").replace(/[\[\]]/g, "").trim();
             
-            // 기사 날짜 파싱
             let dateMatch = block.match(/(\d{1,2}월\s*\d{1,2}일)/);
             let date = dateMatch ? `[${dateMatch[0]}]` : "";
             
-            // 💡 최하단의 '기사 출처' 정확하게 매칭 타겟팅
             let url = "#";
             let urlMatch = block.match(/기사\s*출처\s*[:：]\s*(https?:\/\/[^\s\]<>"]+)/i);
             if (urlMatch) {
@@ -229,12 +243,9 @@
             let contentLines = lines.slice(1);
             let contentText = contentLines.join('\n');
             
-            // 본문 HTML에서 잡다한 메타 텍스트는 지우고 순수 개조식 본문만 유지
             const garbagePatterns = [
                 /기사\s*날짜\s*[:：][^\n]*/gi,
-                /기사\s*출처\s*[:：][\s\S]*/gi,
-                /사진\s*주소\s*[:：][\s\S]*/gi,
-                /비고\s*[:：][\s\S]*/gi
+                /기사\s*출처\s*[:：][\s\S]*/gi
             ];
             garbagePatterns.forEach(p => contentText = contentText.replace(p, ""));
 
@@ -288,7 +299,7 @@
 
     function generateFinal() {
         const userTitleColor = document.getElementById('titleColor').value;
-        const userBtnColor = document.getElementById('00467F').value;
+        const userBtnColor = document.getElementById('btnColor').value;
         const userBtnTextColor = document.getElementById('btnTextColor').value;
 
         const result = document.getElementById('outlook-result');
@@ -336,7 +347,7 @@
         document.getElementById('final-section').style.display = 'block';
     }
 
-    // (하단 축약: updateSize, copyToClipboard, fetchBase64 기능 동일 유지)
+    // (하단 유틸리티 기능 동일)
     function updateSize(idx, val) {
         articles[idx].imgWidth = val;
         document.getElementById(`val_${idx}`).innerText = val + "px";
