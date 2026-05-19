@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V67</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V68</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -51,7 +51,7 @@
         button.primary-btn:hover { background: #1a252f; }
         .btn-new-tab { background: #5d6d7e; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
         
-        .split-ai-btn { background: #00467F; color: white; border: none; padding: 10px 18px; font-size: 13px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 8px; transition: 0.2s; }
+        .split-ai-btn { background: #00467F; color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 8px; transition: 0.2s; }
         .split-ai-btn:hover { background: #002d54; }
         .split-ai-btn:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
 
@@ -62,7 +62,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 67.0 (Isolated Dual-Engine)</div>
+    <div class="ver">Version 68.0 (Friendly UI Edition)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 개별 생성 컨트롤러 (과부하 방지형) 🤖</h3>
@@ -73,19 +73,19 @@
         </div>
         
         <div class="sub-step-box">
-            <div class="sub-step-title">🛠️ Step 0-1. 원자력 신기술 / 신공법 가이드라인</div>
-            <textarea id="aiPromptTech" class="ai-textarea" placeholder="신기술/신공법 뉴스 수집 지침을 입력하세요."></textarea>
-            <button class="split-ai-btn" id="btnTech" onclick="generateTechArticles()">1) 신기술/신공법 기사만 먼저 추출하기 🛠️</button>
+            <div class="sub-step-title">🛠️ Step 0-1. 전반부 기사 가이드라인 (신기술 / 신공법 등)</div>
+            <textarea id="aiPromptTech" class="ai-textarea" placeholder="전반부 뉴스 수집 지침을 입력하세요."></textarea>
+            <button class="split-ai-btn" id="btnTech" onclick="generateTechArticles()">1) 전반부 기사 추출 시작 (신기술/신공법 등) 🛠️</button>
         </div>
 
         <div class="sub-step-box">
-            <div class="sub-step-title">💼 Step 0-2. 원자력 비즈니스 / 정책 가이드라인</div>
-            <textarea id="aiPromptBiz" class="ai-textarea" placeholder="비즈니스/정책 뉴스 수집 지침을 입력하세요."></textarea>
-            <button class="split-ai-btn" id="btnBiz" style="background:#27ae60;" onclick="generateBizArticles()">2) 비즈니스/정책 기사 하단에 이어 붙이기 💼</button>
+            <div class="sub-step-title">💼 Step 0-2. 후반부 기사 가이드라인 (비즈니스 / 정책 등)</div>
+            <textarea id="aiPromptBiz" class="ai-textarea" placeholder="후반부 뉴스 수집 지침을 입력하세요."></textarea>
+            <button class="split-ai-btn" id="btnBiz" style="background:#27ae60;" onclick="generateBizArticles()">2) 후반부 기사 이어 붙이기 (비즈니스/정책 등) 💼</button>
         </div>
         
         <div style="text-align: right; font-size: 12px; color: #7f8c8d; margin-top: 5px;">
-            ※ 창을 완전히 초기화하고 새로고침하려면 페이지를 새로고침(F5) 하세요.
+            ※ 창을 완전히 비우고 처음부터 다시 하려면 새로고침(F5)을 하세요.
         </div>
     </div>
     
@@ -132,7 +132,6 @@
         document.getElementById('aiPromptBiz').value = savedBiz ? savedBiz : `지난 2주 이내의 글로벌 원자력 관련 '비즈니스 및 수주, 정부 정책' 뉴스 5개를 선별해줘.`;
     }
 
-    // 공통 안전 시스템 핵심 지침 고정
     const secureCoreInstruction = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
     반드시 구글 라이브 검색 기능을 활용해 최신 기사를 실시간 서칭하라.
     
@@ -152,7 +151,6 @@
     -. [상세하게 작성된 개조식 본문 요약 내용 문장]
     기사 출처 : [http로 시작하는 순수 URL]`;
 
-    // 🛠️ 1) 신공법 기사 개별 생성 엔진
     async function generateTechArticles() {
         const apiKey = document.getElementById('apiKey').value.trim();
         const promptTech = document.getElementById('aiPromptTech').value.trim();
@@ -163,25 +161,22 @@
         
         const btn = document.getElementById('btnTech');
         btn.disabled = true;
-        btn.innerText = "⏳ 신공법 뉴스 서칭 중...";
+        btn.innerText = "⏳ 전반부 뉴스 서칭 중...";
 
         try {
             const resultText = await callGeminiAPI(apiKey, `사용자 요구사항: ${promptTech}\n\n반드시 원자력 '신기술/신공법/새로운 원자로 설계' 주제의 뉴스를 수집하라.`, secureCoreInstruction);
-            
-            // 깔끔하게 창 초기화 후 첫 데이터 주입
             document.getElementById('dropzone').innerText = resultText.trim();
-            alert("🛠️ 신기술/신공법 기사 수집이 완료되어 적재창에 입력되었습니다.\n이어서 아래 비즈니스 버튼을 누르시면 뒤에 붙습니다.");
+            alert("🛠️ 전반부 기사 수집 완료!\n이어서 아래 후반부 버튼을 누르시면 내용이 뒤에 연달아 붙습니다.");
             parseArticles();
         } catch (e) {
             alert("기사 추출 중 오류가 발생했습니다. 키 값이나 네트워크를 확인하세요.");
             console.error(e);
         } finally {
             btn.disabled = false;
-            btn.innerText = "1) 신기술/신공법 기사만 먼저 추출하기 🛠️";
+            btn.innerText = "1) 전반부 기사 추출 시작 (신기술/신공법 등) 🛠️";
         }
     }
 
-    // 💼 2) 비즈니스 기사 개별 생성 및 이어 붙이기 엔진
     async function generateBizArticles() {
         const apiKey = document.getElementById('apiKey').value.trim();
         const promptBiz = document.getElementById('aiPromptBiz').value.trim();
@@ -192,36 +187,33 @@
         
         const btn = document.getElementById('btnBiz');
         btn.disabled = true;
-        btn.innerText = "⏳ 비즈니스 뉴스 서칭 중...";
+        btn.innerText = "⏳ 후반부 뉴스 서칭 중...";
 
         try {
-            // 현재 적재창에 신공법 기사가 몇 개 있는지 카운트 검사
             const currentText = document.getElementById('dropzone').innerText;
             const existingMatches = currentText.match(/기사\s*\d+\./g) || [];
             const existingCount = existingMatches.length;
 
             const resultText = await callGeminiAPI(apiKey, `사용자 요구사항: ${promptBiz}\n\n반드시 원자력 '비즈니스/수주 계약/정부 정책/에너지 시장 동향' 주제의 뉴스를 수집하라.`, secureCoreInstruction);
             
-            // 비즈니스 번호를 앞선 기사 카운트 뒤로 밀어내기 자동 정렬
             let processedBizText = resultText.replace(/기사\s*(\d+)\./g, function(match, num) {
                 return `기사 ${parseInt(num) + existingCount}.`;
             });
 
-            // 누적 적재 시스템 적용 (기존 글이 있으면 두 줄 띄우고 결합)
             if (currentText.trim().length > 0) {
                 document.getElementById('dropzone').innerText = currentText.trim() + "\n\n" + processedBizText.trim();
             } else {
                 document.getElementById('dropzone').innerText = processedBizText.trim();
             }
 
-            alert(`💼 비즈니스 기사 수집 완료!\n기존 기사 뒤에 이어서 총 ${existingCount + (resultText.match(/기사\s*\d+\./g) || []).length}개의 원고가 완성되었습니다.`);
+            alert(`💼 후반부 기사 수집 완료!\n기존 기사 뒤에 연결되어 통합 원고가 완성되었습니다.`);
             parseArticles();
         } catch (e) {
             alert("기사 추출 중 오류가 발생했습니다. 키 값이나 네트워크를 확인하세요.");
             console.error(e);
         } finally {
             btn.disabled = false;
-            btn.innerText = "2) 비즈니스/정책 기사 하단에 이어 붙이기 💼";
+            btn.innerText = "2) 후반부 기사 이어 붙이기 (비즈니스/정책 등) 💼";
         }
     }
 
@@ -240,7 +232,6 @@
         return data.candidates[0].content.parts[0].text;
     }
 
-    // (기존 완벽 파싱 엔진 및 UI 핸들러 소스코드 안전하게 유지 보존)
     document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.getRangeAt(0).insertNode(textNode); selection.collapseToEnd(); });
     function cleanUrl(url) { if (!url) return "#"; let cleaned = url.split(/[\[\s\]]/)[0]; return cleaned.trim(); }
     function openNewWindow(url) { const cleanedUrl = cleanUrl(url); window.open(cleanedUrl, '_blank', `width=1100,height=850,resizable=yes,scrollbars=yes,status=yes`); }
