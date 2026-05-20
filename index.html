@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V64.4</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V64.5</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -59,7 +59,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 64.4 (Dynamic Target Domains)</div>
+    <div class="ver">Version 64.5 (Live Date & Recency Bias Engine)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (통합 검색 엔진 탑재) 🤖</h3>
@@ -119,7 +119,6 @@
         const savedKey = localStorage.getItem('plant_ti_gemini_key');
         if(savedKey) document.getElementById('apiKey').value = savedKey;
 
-        // 💡 저장된 도메인 목록 로드 (없으면 기본 원자력 9개 사이트 기본 제공)
         const savedDomains = localStorage.getItem('plant_ti_target_domains');
         if(savedDomains) {
             document.getElementById('targetDomains').value = savedDomains;
@@ -131,7 +130,7 @@
         if(savedPrompt) {
             document.getElementById('aiPromptCombined').value = savedPrompt;
         } else {
-            document.getElementById('aiPromptCombined').value = `상단에 지정된 사이트들을 최우선 검색하여 지난 2주 이내의 원자력 관련 '신기술/신공법' 및 '비즈니스/정책' 기사를 종합하여 최대 10개 선정하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [한국어로 번역된 기사 제목]\n기사 날짜 : [MM월 DD일]\n영어 원문 제목 : [원본 기사의 오리지널 영어 제목]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]`;
+            document.getElementById('aiPromptCombined').value = `상단에 지정된 사이트들을 최우선 검색하여 원자력 관련 '신기술/신공법' 및 '비즈니스/정책' 기사를 종합하여 최대 10개 선정하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [한국어로 번역된 기사 제목]\n기사 날짜 : [MM월 DD일]\n영어 원문 제목 : [원본 기사의 오리지널 영어 제목]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]`;
         }
     }
 
@@ -152,16 +151,26 @@
         btn.disabled = true;
         document.getElementById('dropzone').innerText = "";
 
-        // 💡 사용자가 입력창에 제시한 도메인 리스트를 지침 내부에 동적으로 매핑
+        // 💡 실시간 날짜 추적 파이프라인 가동 (PC의 현재 날짜를 실시간으로 계산)
+        const now = new Date();
+        const formattedToday = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+
+        // 🚨 시스템 내부 지침 고도화: 2주 차단 가이드 및 최신성 가중치 랭킹 규칙 탑재
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
         
-        🔒 [도메인 검색 가중치 절대 원칙 - 사용자 지정 동적 연동]
+        📅 [중요: 실시간 날짜 동기화 및 타임라인 앵커]
+        - 오늘의 실제 정확한 날짜는 ** ${formattedToday} ** 이다. 너는 이 날짜를 검색의 완벽한 시간적 기준점으로 삼아야 한다.
+
+        🔒 [날짜 필터 및 최신성 가중치(Recency Bias) 절대 규칙]
+        1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday})를 기준으로 정확히 역산하여 '지난 14일(2주) 이내'에 발행된 뉴스만 수집하라. 오늘로부터 14일 이전의 철 지난 과거 기사는 정보 가치가 없으므로 절대로 단 한 개도 가져오지 마라.
+        2. [🔥 최신성 우선순위 부과]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜에 가장 가깝고 가장 최신인 기사일수록 가중치와 중요도를 대단히 높게 두어 우선 선별하라. 최종 출력 순서 또한 가급적 가장 오늘에 가까운 최신순으로 정렬하여 배치하라.
+
+        🔒 [도메인 검색 가중치 원칙]
         1. [🥇 최최우선 검색]: 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저, 가장 집중적으로 샅샅이 탐색하여 요건에 맞는 뉴스를 선별해야 한다.
            - 대상 도메인 목록: ${targetDomains}
-        2. [⚠️ 제한적 확장 폴백]: 오직 위에 지정된 사이트에서 지난 2주 이내의 기사나 관련 조건에 맞는 소스가 '정말로 존재하지 않아 기사 추출이 완전히 불가능한 비상 상황'일 때에만 예외적으로 범위를 확장하라. 확장 시에는 신뢰할 수 있는 전 세계 관련 정부 기관 사이트(예: .gov) 또는 공인된 단체의 공식 보도자료실 내부로만 제한하며, 일반 뉴스 언론사나 개인 블로그 사이트는 철저히 차단하라.
-        3. 지정된 타겟 사이트들에 소스가 풍부하다면 타 사이트로는 절대로 눈길도 주지 마라.
+        2. [⚠️ 제한적 확장 폴백]: 오직 위에 지정된 사이트에서 조건에 맞는 소스가 '정말로 존재하지 않아 기사 추출이 완전히 불가능한 비상 상황'일 때에만 예외적으로 범위를 확장하라. 확장 시에는 신뢰할 수 있는 전 세계 관련 정부 기관 사이트(예: .gov) 또는 공인된 단체의 공식 보도자료실 내부로만 제한하며, 일반 뉴스 언론사나 개인 블로그 사이트는 철저히 차단하라.
         
-        기사 출처 URL을 절대 상상해서 적지 말고 검색된 진짜 주소를 그대로 대소문자 구별해 복사 붙여넣기 하라. 주소 뒤에 [1], [2] 같은 각주 기호를 절대 붙이지 마라.
+        기사 출처 URL을 절대 상상해서 적지 말고 검색된 진짜 주소를 그대로 복사 붙여넣기 하라. 주소 뒤에 [1], [2] 같은 각주 기호를 절대 붙이지 마라.
         반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 
         영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
 
@@ -174,11 +183,11 @@
         기사 출처 : [순수 URL]`;
 
         try {
-            btn.innerText = "⏳ [Pro 엔진 가동] 지정된 도메인 독점 타겟팅 라이브 실시간 검색 분석 중...";
+            btn.innerText = `⏳ [Pro 엔진 가동] 기준일(${formattedToday}) 중심 2주 이내 초최신 뉴스 타겟 서칭 중...`;
             const rawOutputText = await callGeminiAPI(apiKey, promptCombined, systemInstructionCommon);
 
             document.getElementById('dropzone').innerText = rawOutputText.trim();
-            alert(`🤖 구글 실시간 동기화 및 팩트 매칭 완료!\n작성된 원고들이 1단계 통합 표시창에 자동 주입되었습니다.`);
+            alert(`🤖 실시간 동기화 완료!\n오늘 날짜(${formattedToday}) 기준 2주 이내의 초최신 뉴스들이 정렬 주입되었습니다.`);
             parseArticles(); 
             
         } catch (e) {
@@ -309,7 +318,7 @@
     }
     
     function updateSize(idx, val) { articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 오리지널 V64 포맷 마스터링 디자인 복사가 완료되었습니다!"); }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 최신 정렬이 완료된 오리지널 V64 포맷 디자인 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
