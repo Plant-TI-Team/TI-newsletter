@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V64.5</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V64.6</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -17,7 +17,7 @@
         
         .sub-step-box { background: white; border: 1px solid #cce2ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .sub-step-title { font-size: 14px; font-weight: bold; color: #00467F; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .ai-textarea { width: 100%; min-height: 140px; border: 1px solid #b3d7ff; border-radius: 6px; padding: 12px; box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.5; }
+        .ai-textarea { width: 100%; min-height: 100px; border: 1px solid #b3d7ff; border-radius: 6px; padding: 12px; box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.5; }
 
         .config-panel { background: #f8f9fa; border: 1px solid #e1e8ed; padding: 20px; border-radius: 10px; margin-top: 20px; display: flex; gap: 30px; align-items: center; }
         .config-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; color: #2c3e50; }
@@ -59,32 +59,48 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 64.5 (Live Date & Recency Bias Engine)</div>
+    <div class="ver">Version 64.6 (3-Split Concentration Pro System)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
-    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (통합 검색 엔진 탑재) 🤖</h3>
+    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
     <div class="ai-panel">
         <div class="ai-key-box">
             <div class="ai-key-row">
                 <span style="font-size: 13px; font-weight: bold; color: #333; width: 130px;">🔑 Gemini API Key:</span>
-                <input type="password" id="apiKey" placeholder="Google AI Studio에서 발급받은 유료/무료 API Key를 입력하세요">
+                <input type="password" id="apiKey" placeholder="Google AI Studio에서 발급받은 유료 API Key를 입력하세요">
             </div>
             <div class="ai-key-row" style="margin-top: 8px;">
                 <span style="font-size: 13px; font-weight: bold; color: #00467F; width: 130px;">🌐 우선 검색 도메인:</span>
                 <input type="text" id="targetDomains" placeholder="예: iaea.org, world-nuclear.org, nei.org (쉼표나 띄어쓰기로 구분)">
             </div>
         </div>
+
+        <div class="sub-step-box" style="background-color: #fffdf0; border: 1px solid #ffeb3b;">
+            <div class="sub-step-title" style="color: #b78a00;">📋 [공통 적용 마스터 가이드] 문체 및 분량 절대 규칙 (영구 기억)</div>
+            <textarea id="aiPromptCommon" class="ai-textarea" style="min-height: 80px;" placeholder="모든 단계 추출 시 무조건 적용할 글자 수 분량 및 번역 스타일 지침을 입력하세요."></textarea>
+        </div>
         
         <div class="sub-step-box">
-            <div class="sub-step-title">📝 글로벌 뉴스레터 종합 수집 가이드라인 (영구 기억 장치 연동)</div>
-            <textarea id="aiPromptCombined" class="ai-textarea" placeholder="원자력 신기술, 신공법 및 비즈니스 정책 뉴스 수집 전체 가이드를 자유롭게 입력하세요."></textarea>
+            <div class="sub-step-title">🛠️ Step 0-1. 1차 뉴스 가이드라인 (기사 3개 처음 추출)</div>
+            <textarea id="aiPrompt1" class="ai-textarea" placeholder="1차로 서칭 및 요약할 주제를 입력하세요 (예: 원자력 신기술/신공법 뉴스)."></textarea>
+            <button class="primary-btn" id="aiGenBtn1" style="background:#00467F; font-size:14px; padding:10px; margin-top:5px;" onclick="generateAIArticles(1)">0-1단계: 1차 뉴스 추출 시작 (기존 리셋) 🚀</button>
         </div>
 
-        <button class="primary-btn" id="aiGenBtn" style="background:#00467F; font-size:16px; padding:14px;" onclick="generateAIArticles()">구글 라이브 실시간 검색 및 1단계 통합 주입 시작 🚀</button>
+        <div class="sub-step-box">
+            <div class="sub-step-title">💼 Step 0-2. 2차 뉴스 가이드라인 (기사 3개 이어서 빌드)</div>
+            <textarea id="aiPrompt2" class="ai-textarea" placeholder="2차로 연속 탐색하여 이어 붙일 주제를 입력하세요 (예: 원자력 비즈니스/정책 뉴스)."></textarea>
+            <button class="primary-btn" id="aiGenBtn2" style="background:#27ae60; font-size:14px; padding:10px; margin-top:5px;" onclick="generateAIArticles(2)">0-2단계: 2차 뉴스 이어 붙이기 💼</button>
+        </div>
+
+        <div class="sub-step-box">
+            <div class="sub-step-title">🌐 Step 0-3. 3차 뉴스 가이드라인 (기사 3개 최종 누적)</div>
+            <textarea id="aiPrompt3" class="ai-textarea" placeholder="3차로 추가 서칭하여 최종 누적할 주제를 입력하세요 (예: 글로벌 Market 동향 및 SMR 라이선스 이슈)."></textarea>
+            <button class="primary-btn" id="aiGenBtn3" style="background:#8e44ad; font-size:14px; padding:10px; margin-top:5px;" onclick="generateAIArticles(3)">0-3단계: 3차 뉴스 최종 누적 🌐</button>
+        </div>
     </div>
     
     <h3 class="section-title">Step 1. 통합 기사 확인 및 정제 (최대 10개 표시창)</h3>
-    <div id="dropzone" contenteditable="true" placeholder="0단계의 결과물 원고가 이곳에 자동 주입되거나 직접 편집할 수 있습니다."></div>
+    <div id="dropzone" contenteditable="true" placeholder="0단계의 복합 분할 추출 결과물들이 순서대로 이곳에 오차 없이 자동 정렬되어 누적 주입됩니다."></div>
     <button class="primary-btn" onclick="parseArticles()">1단계: 통합 분석 및 제목 리스트 생성 🔍</button>
     
     <div id="selection-area" style="display:none; margin-top:20px;">
@@ -126,36 +142,54 @@
             document.getElementById('targetDomains').value = `iaea.org, world-nuclear.org, nei.org, world-nuclear-news.org, power-eng.com, inl.gov, nucnet.org, ans.org, neimagazine.com`;
         }
 
-        const savedPrompt = localStorage.getItem('plant_ti_gemini_prompt_combined');
-        if(savedPrompt) {
-            document.getElementById('aiPromptCombined').value = savedPrompt;
+        const savedCommon = localStorage.getItem('plant_ti_prompt_common');
+        if(savedCommon) {
+            document.getElementById('aiPromptCommon').value = savedCommon;
         } else {
-            document.getElementById('aiPromptCombined').value = `상단에 지정된 사이트들을 최우선 검색하여 원자력 관련 '신기술/신공법' 및 '비즈니스/정책' 기사를 종합하여 최대 10개 선정하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [한국어로 번역된 기사 제목]\n기사 날짜 : [MM월 DD일]\n영어 원문 제목 : [원본 기사의 오리지널 영어 제목]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]`;
+            document.getElementById('aiPromptCommon').value = `[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.`;
         }
+
+        const savedPrompt1 = localStorage.getItem('plant_ti_prompt_1');
+        if(savedPrompt1) document.getElementById('aiPrompt1').value = savedPrompt1;
+        else document.getElementById('aiPrompt1').value = `지정된 사이트들을 최우선 검색하여 지난 2주 이내의 원자력 관련 '신기술 및 신공법' 기사를 정확히 3개 선정하라.`;
+
+        const savedPrompt2 = localStorage.getItem('plant_ti_prompt_2');
+        if(savedPrompt2) document.getElementById('aiPrompt2').value = savedPrompt2;
+        else document.getElementById('aiPrompt2').value = `지정된 사이트들을 최우선 검색하여 지난 2주 이내의 원자력 관련 '비즈니스 및 정책' 기사를 정확히 3개 선정하여 이어 붙여라.`;
+
+        const savedPrompt3 = localStorage.getItem('plant_ti_prompt_3');
+        if(savedPrompt3) document.getElementById('aiPrompt3').value = savedPrompt3;
+        else document.getElementById('aiPrompt3').value = `지정된 사이트들을 최우선 검색하여 지난 2주 이내의 '글로벌 SMR(소형 모듈 원자로) 프로젝트 및 라이선스 동향' 기사를 정확히 3개 선정하여 최종 누적하라.`;
     }
 
-    async function generateAIArticles() {
+    async function generateAIArticles(stage) {
         const apiKey = document.getElementById('apiKey').value.trim();
         const targetDomains = document.getElementById('targetDomains').value.trim();
-        const promptCombined = document.getElementById('aiPromptCombined').value.trim();
+        const promptCommon = document.getElementById('aiPromptCommon').value.trim();
+        const promptStage = document.getElementById('aiPrompt' + stage).value.trim();
         
         if(!apiKey) { alert("Gemini API Key를 입력해주세요."); return; }
         if(!targetDomains) { alert("우선 검색할 도메인 주소를 입력해주세요."); return; }
-        if(!promptCombined) { alert("종합 가이드라인을 입력해주세요."); return; }
+        if(!promptStage) { alert(`Step 0-${stage} 가이드라인을 입력해주세요.`); return; }
         
         localStorage.setItem('plant_ti_gemini_key', apiKey);
         localStorage.setItem('plant_ti_target_domains', targetDomains);
-        localStorage.setItem('plant_ti_gemini_prompt_combined', promptCombined);
+        localStorage.setItem('plant_ti_prompt_common', promptCommon);
+        localStorage.setItem('plant_ti_prompt_' + stage, promptStage);
         
-        const btn = document.getElementById('aiGenBtn');
+        const btn = document.getElementById('aiGenBtn' + stage);
+        const originalBtnText = btn.innerText;
         btn.disabled = true;
-        document.getElementById('dropzone').innerText = "";
-
-        // 💡 실시간 날짜 추적 파이프라인 가동 (PC의 현재 날짜를 실시간으로 계산)
+        
+        const drop = document.getElementById('dropzone');
         const now = new Date();
         const formattedToday = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
 
-        // 🚨 시스템 내부 지침 고도화: 2주 차단 가이드 및 최신성 가중치 랭킹 규칙 탑재
+        // 💡 0-1단계는 판을 새로 짜고, 0-2 및 0-3단계는 기존 텍스트 카운트를 기억하고 누적 연동시킴
+        let currentText = (stage === 1) ? "" : (drop.innerText || "");
+        let matches = currentText.match(/기사\s*\d+\./g) || [];
+        let baseCount = matches.length;
+
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
         
         📅 [중요: 실시간 날짜 동기화 및 타임라인 앵커]
@@ -163,7 +197,7 @@
 
         🔒 [날짜 필터 및 최신성 가중치(Recency Bias) 절대 규칙]
         1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday})를 기준으로 정확히 역산하여 '지난 14일(2주) 이내'에 발행된 뉴스만 수집하라. 오늘로부터 14일 이전의 철 지난 과거 기사는 정보 가치가 없으므로 절대로 단 한 개도 가져오지 마라.
-        2. [🔥 최신성 우선순위 부과]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜에 가장 가깝고 가장 최신인 기사일수록 가중치와 중요도를 대단히 높게 두어 우선 선별하라. 최종 출력 순서 또한 가급적 가장 오늘에 가까운 최신순으로 정렬하여 배치하라.
+        2. [🔥 최신성 우선순위 부과]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜에 가장 가깝고 가장 최신인 기사일수록 가중치와 중요도를 대단히 높게 두어 우선 선별하라. 최종 출력 순서 또한 가장 오늘에 가까운 최신순으로 정렬하여 배치하라.
 
         🔒 [도메인 검색 가중치 원칙]
         1. [🥇 최최우선 검색]: 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저, 가장 집중적으로 샅샅이 탐색하여 요건에 맞는 뉴스를 선별해야 한다.
@@ -171,7 +205,7 @@
         2. [⚠️ 제한적 확장 폴백]: 오직 위에 지정된 사이트에서 조건에 맞는 소스가 '정말로 존재하지 않아 기사 추출이 완전히 불가능한 비상 상황'일 때에만 예외적으로 범위를 확장하라. 확장 시에는 신뢰할 수 있는 전 세계 관련 정부 기관 사이트(예: .gov) 또는 공인된 단체의 공식 보도자료실 내부로만 제한하며, 일반 뉴스 언론사나 개인 블로그 사이트는 철저히 차단하라.
         
         기사 출처 URL을 절대 상상해서 적지 말고 검색된 진짜 주소를 그대로 복사 붙여넣기 하라. 주소 뒤에 [1], [2] 같은 각주 기호를 절대 붙이지 마라.
-        반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 
+        반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 부연적인 인삿말은 모두 생략하라.
         영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
 
         [포맷]
@@ -182,19 +216,32 @@
         -. [상세하고 길게 작성된 개조식 본문 문장]
         기사 출처 : [순수 URL]`;
 
-        try {
-            btn.innerText = `⏳ [Pro 엔진 가동] 기준일(${formattedToday}) 중심 2주 이내 초최신 뉴스 타겟 서칭 중...`;
-            const rawOutputText = await callGeminiAPI(apiKey, promptCombined, systemInstructionCommon);
+        // 마스터 가이드와 현재 단계 개별 가이드를 결합하여 주입
+        const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 기사를 정확히 3개만 솎아내어 출력하도록 집중하라.`;
 
-            document.getElementById('dropzone').innerText = rawOutputText.trim();
-            alert(`🤖 실시간 동기화 완료!\n오늘 날짜(${formattedToday}) 기준 2주 이내의 초최신 뉴스들이 정렬 주입되었습니다.`);
+        try {
+            btn.innerText = `⏳ [0-${stage}단계 진행중] 공통지침 반영 및 최신 뉴스 3개 정밀 분석 중...`;
+            const rawOutputText = await callGeminiAPI(apiKey, combinedPrompt, systemInstructionCommon);
+
+            // AI가 출력한 '기사 1.' '기사 2.' 순번을 기존에 누적된 번호 뒤로 유연하게 밀어주는 치환 파이프라인
+            let processedText = rawOutputText.replace(/기사\s*(\d+)\./g, function(match, num) {
+                return `기사 ${parseInt(num) + baseCount}.`;
+            });
+
+            if (stage === 1) {
+                drop.innerText = rawOutputText.trim();
+            } else {
+                drop.innerText = (drop.innerText.trim() ? drop.innerText.trim() + "\n\n" : "") + processedText.trim();
+            }
+            
+            alert(`🤖 0-${stage}단계 추출 및 연동 성공!\n현재까지 총 ${(drop.innerText.match(/기사\s*\d+\./g) || []).length}개의 기사가 오차 없이 누적 주입되었습니다.`);
             parseArticles(); 
             
         } catch (e) {
             alert("기사 추출 연동 중 오류가 발생했습니다. Key 설정이나 네트워크를 확인하세요.");
             console.error(e);
         } finally {
-            btn.innerText = "구글 라이브 실시간 검색 및 1단계 통합 주입 시작 🚀";
+            btn.innerText = originalBtnText;
             btn.disabled = false;
         }
     }
@@ -318,7 +365,7 @@
     }
     
     function updateSize(idx, val) { articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 최신 정렬이 완료된 오리지널 V64 포맷 디자인 복사가 완료되었습니다!"); }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 오리지널 V64 포맷 마스터링 디자인 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
