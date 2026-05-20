@@ -2,80 +2,108 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 마스터 (V79)</title>
+    <title>Plant TI 뉴스레터 마스터 (V79.1)</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background: #f4f7f9; padding: 20px; color: #333; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; border-bottom: 2px solid #00467F; padding-bottom: 10px; }
-        .box { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
+        .box { margin-bottom: 25px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
         textarea { width: 100%; height: 100px; margin: 10px 0; padding: 10px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { background: #00467F; color: white; border: none; padding: 12px 18px; cursor: pointer; border-radius: 5px; font-weight: bold; margin-right: 5px; }
-        .btn-sub { background: #5d6d7e; }
-        .btn-final { background: #D35400; width: 100%; font-size: 16px; margin-top: 20px; }
-        #dropzone { width: 100%; height: 200px; border: 2px dashed #00467F; padding: 10px; overflow-y: auto; margin-top: 10px; background: #fff; }
-        .article-card { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; }
-        input.url-edit { width: 100%; padding: 5px; margin-top: 5px; }
+        button { background: #00467F; color: white; border: none; padding: 12px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; margin-top: 5px; }
+        .article-card { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; background: #f9f9f9; }
+        .url-edit { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #aaa; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📧 Plant TI 뉴스레터 마스터 (V79)</h1>
+    <h1>📧 Plant TI 뉴스레터 마스터 (V79.1)</h1>
     
     <div class="box">
-        <label>API Key:</label>
-        <input type="password" id="apiKey" style="width:100%; padding:8px; margin-top:5px;">
+        <label><b>API Key:</b></label>
+        <input type="password" id="apiKey" style="width:100%; padding:8px; margin-top:5px; margin-bottom:15px;">
+        
+        <label><b>전반부 가이드라인:</b></label>
+        <textarea id="promptTech"></textarea>
+        <button onclick="extract('Tech')">전반부 기사 추출하기 (1단계-1) 🛠️</button>
+        
+        <div style="margin-top:20px;"></div>
+        
+        <label><b>후반부 가이드라인:</b></label>
+        <textarea id="promptBiz"></textarea>
+        <button onclick="extract('Biz')" style="background:#27ae60;">후반부 기사 이어 붙이기 (1단계-2) 💼</button>
     </div>
 
     <div class="box">
-        <label>가이드라인 입력:</label>
-        <textarea id="prompt"></textarea>
-        <button onclick="extractArticles('전반부')">전반부 기사 추출 (1단계) 🛠️</button>
-        <button onclick="extractArticles('후반부')" class="btn-sub">후반부 기사 이어 붙이기 💼</button>
+        <div id="dropzone" contenteditable="true" style="width:100%; height:150px; border:1px solid #ccc; padding:10px; overflow-y:auto;"></div>
+        <button onclick="parseArticles()" style="background:#D35400; width:100%; margin-top:10px;">기사 분석 및 URL 수정 모드 (1단계 종료) 🔍</button>
     </div>
 
-    <div id="dropzone" contenteditable="true"></div>
+    <div id="editor-area"></div>
     
-    <button class="btn-final" onclick="parseAndEdit()">1단계 종료 후, 2단계: 기사 승인 및 URL 수정 📋</button>
-
-    <div id="editor-area" style="margin-top:20px;"></div>
-    
-    <button id="step3-btn" style="display:none; width:100%; background:#27ae60; margin-top:20px; padding:15px; font-size:16px;" onclick="copyToClipboard()">3단계: 최종 뉴스레터 본문 복사하기 ✨</button>
+    <button id="step2-btn" style="display:none; width:100%; background:#2c3e50; padding:15px; font-size:16px;" onclick="generateFinal()">2단계: 최종 뉴스레터 생성 (승인) 📋</button>
+    <div id="final-output" style="display:none; white-space:pre-wrap; border:2px solid #27ae60; padding:20px; margin-top:20px;"></div>
+    <button id="step3-btn" style="display:none; width:100%; background:#27ae60; padding:15px; margin-top:10px;" onclick="copyToClipboard()">3단계: 아웃룩 본문 복사하기 ✨</button>
 </div>
 
 <script>
-    let currentArticles = [];
+    let articles = [];
 
-    async function extractArticles(part) {
+    async function extract(type) {
         const key = document.getElementById('apiKey').value;
-        const prompt = document.getElementById('prompt').value;
+        const prompt = document.getElementById(type === 'Tech' ? 'promptTech' : 'promptBiz').value;
         const drop = document.getElementById('dropzone');
         
         try {
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${key}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt + "\n[규칙] 한글 제목, 영어 원문 제목, 기사 URL을 반드시 포함하라." }] }],
-                    tools: [{"googleSearch": {}}]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt + "\n[규칙] 반드시 '기사 제목', '영어 원문 제목', '실제 주소(URL)'를 포함하라." }] }], tools: [{"googleSearch": {}}] })
             });
             const data = await res.json();
             const text = data.candidates[0].content.parts[0].text;
-            if(part === '전반부') drop.innerText = text;
+            if(type === 'Tech') drop.innerText = text;
             else drop.innerText += "\n\n" + text;
-            alert(part + " 추출 완료!");
+            alert(type + " 추출 완료!");
         } catch(e) { alert("연동 오류"); }
     }
 
-    function parseAndEdit() {
+    function parseArticles() {
         const raw = document.getElementById('dropzone').innerText;
-        // 기사별로 나누고 제목/주소 분리하는 로직 (기존 parseArticles 활용)
-        // ... (이 부분은 이전 코드를 그대로 가져와서 수정 가능하도록 배치)
-        alert("기사 편집 모드 활성화: 아래에서 URL을 직접 수정하세요.");
-        // [여기에 기사 카드와 URL 입력창 렌더링 로직 추가]
+        const blocks = raw.split(/기사\s*\d+\./); articles = [];
+        const editor = document.getElementById('editor-area');
+        editor.innerHTML = "<h3>📝 기사 주소 수정 (제목으로 검색 가능)</h3>";
+        
+        for (let i = 1; i < blocks.length; i++) {
+            let b = blocks[i].trim();
+            let title = b.split('\n')[0].trim();
+            let urlMatch = b.match(/https?:\/\/[^\s]+/);
+            let url = urlMatch ? urlMatch[0] : "";
+            articles.push({ title, url });
+            
+            editor.innerHTML += `
+                <div class="article-card">
+                    <b>${i}. ${title}</b><br>
+                    <button onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(title)}')">제목으로 구글 검색 🔍</button>
+                    <input type="text" class="url-edit" value="${url}" onchange="articles[${i-1}].url = this.value">
+                </div>`;
+        }
+        document.getElementById('step2-btn').style.display = 'block';
     }
 
-    function copyToClipboard() { /* 최종 뉴스레터 본문 복사 로직 */ }
+    function generateFinal() {
+        const output = document.getElementById('final-output');
+        output.style.display = 'block';
+        output.innerHTML = articles.map(a => `제목: ${a.title}\n주소: ${a.url}\n------------------`).join('\n');
+        document.getElementById('step3-btn').style.display = 'block';
+    }
+
+    function copyToClipboard() {
+        const range = document.createRange();
+        range.selectNode(document.getElementById('final-output'));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        alert("아웃룩에 붙여넣기 하세요!");
+    }
 </script>
 </body>
 </html>
