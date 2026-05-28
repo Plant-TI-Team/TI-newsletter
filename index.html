@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V64.6</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65.2</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -59,7 +59,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 64.6 (3-Split Concentration Pro System)</div>
+    <div class="ver">Version 65.2 (Dual-Shield Engine)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
@@ -130,6 +130,7 @@
 
 <script>
     let articles = [];
+    window.articles = articles; 
 
     window.onload = function() {
         const savedKey = localStorage.getItem('plant_ti_gemini_key');
@@ -185,7 +186,6 @@
         const now = new Date();
         const formattedToday = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
 
-        // 💡 0-1단계는 판을 새로 짜고, 0-2 및 0-3단계는 기존 텍스트 카운트를 기억하고 누적 연동시킴
         let currentText = (stage === 1) ? "" : (drop.innerText || "");
         let matches = currentText.match(/기사\s*\d+\./g) || [];
         let baseCount = matches.length;
@@ -199,12 +199,16 @@
         1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday})를 기준으로 정확히 역산하여 '지난 14일(2주) 이내'에 발행된 뉴스만 수집하라. 오늘로부터 14일 이전의 철 지난 과거 기사는 정보 가치가 없으므로 절대로 단 한 개도 가져오지 마라.
         2. [🔥 최신성 우선순위 부과]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜에 가장 가깝고 가장 최신인 기사일수록 가중치와 중요도를 대단히 높게 두어 우선 선별하라. 최종 출력 순서 또한 가장 오늘에 가까운 최신순으로 정렬하여 배치하라.
 
+        🔒 [🚨 URL 무결성 및 절대 보장 지침 - 위반 절대 금지]
+        1. '기사 출처 :' 뒤에 적는 모든 URL 주소는 검색 결과에 나온 풀 주소(Full URL) 그대로 한 글자도 빠짐없이 완벽하게 출력하라.
+        2. 하이픈(-)이나 단어 슬러그가 아무리 길어지더라도 절대로 중간에 자르거나 축약하지 마라. 맨 뒤 세부 파일명과 파라미터까지 전부 끝까지 받아 적어야 한다.
+        3. 주소 문자열을 가공, 편집, 압축하지 말고 원형 그대로 출력하라. 주소 뒤에 문장 부호 마침표(.)나 각주 부호 [1], [2] 등을 절대로 붙이지 마라.
+
         🔒 [도메인 검색 가중치 원칙]
         1. [🥇 최최우선 검색]: 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저, 가장 집중적으로 샅샅이 탐색하여 요건에 맞는 뉴스를 선별해야 한다.
            - 대상 도메인 목록: ${targetDomains}
         2. [⚠️ 제한적 확장 폴백]: 오직 위에 지정된 사이트에서 조건에 맞는 소스가 '정말로 존재하지 않아 기사 추출이 완전히 불가능한 비상 상황'일 때에만 예외적으로 범위를 확장하라. 확장 시에는 신뢰할 수 있는 전 세계 관련 정부 기관 사이트(예: .gov) 또는 공인된 단체의 공식 보도자료실 내부로만 제한하며, 일반 뉴스 언론사나 개인 블로그 사이트는 철저히 차단하라.
         
-        기사 출처 URL을 절대 상상해서 적지 말고 검색된 진짜 주소를 그대로 복사 붙여넣기 하라. 주소 뒤에 [1], [2] 같은 각주 기호를 절대 붙이지 마라.
         반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 부연적인 인삿말은 모두 생략하라.
         영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
 
@@ -216,14 +220,45 @@
         -. [상세하고 길게 작성된 개조식 본문 문장]
         기사 출처 : [순수 URL]`;
 
-        // 마스터 가이드와 현재 단계 개별 가이드를 결합하여 주입
         const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 기사를 정확히 3개만 솎아내어 출력하도록 집중하라.`;
 
         try {
             btn.innerText = `⏳ [0-${stage}단계 진행중] 공통지침 반영 및 최신 뉴스 3개 정밀 분석 중...`;
-            const rawOutputText = await callGeminiAPI(apiKey, combinedPrompt, systemInstructionCommon);
+            const data = await callGeminiAPI(apiKey, combinedPrompt, systemInstructionCommon);
+            
+            if (!data.candidates || !data.candidates[0]) {
+                throw new Error("Gemini API로부터 올바른 응답을 받지 못했습니다. API Key나 쿼리를 점검하세요.");
+            }
 
-            // AI가 출력한 '기사 1.' '기사 2.' 순번을 기존에 누적된 번호 뒤로 유연하게 밀어주는 치환 파이프라인
+            let rawOutputText = data.candidates[0].content.parts[0].text;
+            const groundingChunks = data.candidates[0].groundingMetadata?.groundingChunks || [];
+
+            // 🛡️ [1차 방어선] 메타데이터의 실시간 검색 원본 주소 강제 동기화 매핑
+            if (groundingChunks.length > 0) {
+                let articleBlocks = rawOutputText.split(/(?=기사\s*\d+\.)/);
+                for (let i = 0; i < articleBlocks.length; i++) {
+                    let block = articleBlocks[i];
+                    if (!block.trim().startsWith('기사')) continue;
+                    
+                    let engTitleMatch = block.match(/(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：]\s*(.*)/i);
+                    let engTitle = engTitleMatch ? engTitleMatch[1].replace(/[\[\]]/g, "").trim() : "";
+                    
+                    let srcLineMatch = block.match(/(기사\s*출처\s*[:：]\s*)(.*)/i);
+                    
+                    if (engTitle && srcLineMatch) {
+                        let currentUrlValue = srcLineMatch[2].trim();
+                        let approxUrl = currentUrlValue.startsWith('http') ? currentUrlValue.split(/\s+/)[0] : "";
+                        
+                        let bestUrl = findBestGroundingUrl(engTitle, approxUrl, groundingChunks);
+                        if (bestUrl) {
+                            block = block.replace(srcLineMatch[0], srcLineMatch[1] + bestUrl);
+                            articleBlocks[i] = block;
+                        }
+                    }
+                }
+                rawOutputText = articleBlocks.join('');
+            }
+
             let processedText = rawOutputText.replace(/기사\s*(\d+)\./g, function(match, num) {
                 return `기사 ${parseInt(num) + baseCount}.`;
             });
@@ -246,6 +281,41 @@
         }
     }
 
+    function findBestGroundingUrl(engTitle, hallucinatedUrl, groundingChunks) {
+        if (!groundingChunks || groundingChunks.length === 0) return null;
+        let bestUrl = null;
+        let maxScore = -1;
+        const getKeywords = (str) => {
+            if (!str) return [];
+            return str.toLowerCase().replace(/[^a-z0-9가-힣\s]/g, ' ').split(/\s+/).filter(w => w.length > 1);
+        };
+        const titleKeywords = getKeywords(engTitle);
+        let targetDomain = "";
+        if (hallucinatedUrl && hallucinatedUrl.startsWith('http')) {
+            try { targetDomain = new URL(hallucinatedUrl).hostname.replace('www.', ''); } catch(e) {}
+        }
+        for (const chunk of groundingChunks) {
+            if (!chunk.web || !chunk.web.uri) continue;
+            let chunkUrl = chunk.web.uri;
+            let chunkTitle = chunk.web.title || "";
+            let score = 0;
+            if (targetDomain) {
+                try {
+                    let chunkDomain = new URL(chunkUrl).hostname.replace('www.', '');
+                    if (chunkDomain.includes(targetDomain) || targetDomain.includes(chunkDomain)) { score += 20; }
+                } catch(e) {}
+            }
+            const chunkTitleKeywords = getKeywords(chunkTitle);
+            let matchCount = 0;
+            titleKeywords.forEach(kw => {
+                if (chunkTitleKeywords.includes(kw) || chunkUrl.toLowerCase().includes(kw)) { matchCount++; }
+            });
+            score += matchCount * 10;
+            if (score > maxScore && score > 0) { maxScore = score; bestUrl = chunkUrl; }
+        }
+        return bestUrl;
+    }
+
     async function callGeminiAPI(key, prompt, systemInstruction) {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${key}`, {
             method: 'POST',
@@ -256,12 +326,27 @@
                 tools: [{"googleSearch": {}}] 
             })
         });
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
+        return await response.json();
+    }
+
+    // 🌐 [신규 반영] 제목 및 출처 기반 검색 URL 동적 빌더 함수
+    function buildSearchUrl(title, source, date) {
+        let cleanSource = source.replace(/https?:\/\/[^\s]+/g, "").trim(); 
+        let cleanDate = date ? date.replace(/[\[\]]/g, "").trim() : "";
+        let query = `${title}`;
+        if (cleanSource && cleanSource.length < 50) query += ` ${cleanSource}`;
+        if (cleanDate) query += ` ${cleanDate}`;
+        return `https://www.google.com/search?q=${encodeURIComponent(query.trim())}`;
     }
 
     document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.getRangeAt(0).insertNode(textNode); selection.collapseToEnd(); });
-    function cleanUrl(url) { if (!url) return "#"; let cleaned = url.split(/[\[\s\]]/)[0]; return cleaned.trim(); }
+    
+    function cleanUrl(url) { 
+        if (!url) return "#"; 
+        let cleaned = url.split(/[\[\s\]"']/)[0]; 
+        return cleaned.replace(/[.,;:)\s]+$/, "").trim(); 
+    }
+    
     function openNewWindow(url) { const cleanedUrl = cleanUrl(url); window.open(cleanedUrl, '_blank', `width=1100,height=850,resizable=yes,scrollbars=yes,status=yes`); }
     
     function parseArticles() { 
@@ -282,13 +367,27 @@
             let engTitleMatch = block.match(/(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：]\s*(.*)/i);
             let engTitle = engTitleMatch ? engTitleMatch[1].replace(/[\[\]]/g, "").trim() : cleanTitle;
 
+            // 🛡️ [2차 방어선] 출처 텍스트 추출 및 정밀 파싱 매트릭스 반영
+            let sourceMatch = block.match(/기사\s*출처\s*[:：]\s*([^\n]+)/i);
+            let source = sourceMatch ? sourceMatch[1].trim() : "";
+
             let url = "#"; 
-            let urlMatch = block.match(/기사\s*출처\s*[:：]\s*(https?:\/\/[^\s\]<>"]+)/i); 
-            if (urlMatch) { url = cleanUrl(urlMatch[1]); } 
-            else { 
-                let fallbackMatch = block.match(/https?:\/\/[^\s\]<>"]+/); 
-                if (fallbackMatch) url = cleanUrl(fallbackMatch[0]); 
+            let urlMatch = block.match(/https?:\/\/[^\s\]<> "']+/g); 
+
+            if (urlMatch && urlMatch.length > 0) {
+                // 출처 한 줄 내부에 유효한 주소가 파싱되는지 우선 필터링
+                let sourceUrlMatch = source.match(/https?:\/\/[^\s\]<> "']+/);
+                if (sourceUrlMatch) {
+                    url = cleanUrl(sourceUrlMatch[0]);
+                } else {
+                    url = cleanUrl(urlMatch[urlMatch.length - 1]);
+                }
             } 
+
+            // 만약 URL 추출에 실패했거나 깨진 경우 생성한 검색 매트릭스로 즉시 강제 Fallback 처리
+            if (!url.startsWith("http")) {
+                url = buildSearchUrl(engTitle, source, date);
+            }
             
             let contentLines = lines.slice(1); 
             const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:：]\s*[\s\S]*/gi, /(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：][^\n]*/gi ]; 
@@ -317,29 +416,32 @@
         const list = document.getElementById('selection-list'); 
         list.innerHTML = ''; 
         articles.forEach((art, idx) => { 
-            const item = document.createElement('div'); 
-            item.className = 'article-select-item'; 
-            item.innerHTML = ` 
-                <input type="checkbox" checked onchange="articles[${idx}].selected = this.checked"> 
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0;">
-                    <div class="title-text">${idx+1}. ${art.title}</div>
-                    <div style="font-size: 13px; color: #666; font-style: italic; padding-left: 2px;">영문 원문 Title: ${art.engTitle}</div>
-                    
-                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
-                        <button class="btn-new-tab" onclick="openNewWindow(articles[${idx}].url)">기사 그림 가져오기 🔗</button>
-                        <button class="btn-new-tab" style="background-color: #e67e22;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent(articles[${idx}].engTitle), '_blank')">제목 검색 🔍</button>
-                        <input type="text" value="${art.url}" style="flex: 1; padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;" onchange="articles[${idx}].url = this.value" placeholder="주소가 틀릴 경우 위 검색 버튼으로 찾은 진짜 주소를 여기에 붙여넣으세요">
+            const isFallback = art.url.startsWith('https://www.google.com/search');
+            const urlInputStyle = isFallback ? "flex: 1; padding: 6px; border: 2px solid #e67e22; border-radius: 4px; font-size: 13px; background-color: #fff5eb;" : "flex: 1; padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;";
+            
+            list.appendChild(document.createElement('div')).replaceWith(Object.assign(document.createElement('div'), {
+                className: 'article-select-item',
+                innerHTML: ` 
+                    <input type="checkbox" checked onchange="window.articles[${idx}].selected = this.checked"> 
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0;">
+                        <div class="title-text">${idx+1}. ${art.title} ${isFallback ? "<span style='color:#e67e22; font-size:11px;'>[⚠️ 검색 Fallback 주입됨]</span>" : ""}</div>
+                        <div style="font-size: 13px; color: #666; font-style: italic; padding-left: 2px;">영문 원문 Title: ${art.engTitle}</div>
+                        
+                        <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                            <button class="btn-new-tab" onclick="openNewWindow(window.articles[${idx}].url)">기사 그림 가져오기 🔗</button>
+                            <button class="btn-new-tab" style="background-color: #e67e22;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent(window.articles[${idx}].engTitle), '_blank')">제목 검색 🔍</button>
+                            <input type="text" value="${art.url}" style="${urlInputStyle}" onchange="window.articles[${idx}].url = this.value" placeholder="진짜 주소를 찾아 여기에 붙여넣으세요">
+                        </div>
                     </div>
-                </div>
-                <div class="image-drop-mini" id="drop_${idx}" ondragover="event.preventDefault();" ondrop="handleDrop(event, ${idx})">그림 던지기</div> 
-            `; 
-            list.appendChild(item); 
+                    <div class="image-drop-mini" id="drop_${idx}" ondragover="event.preventDefault();" ondrop="handleDrop(event, ${idx})">그림 던지기</div> 
+                `
+            }));
         }); 
         document.getElementById('selection-area').style.display = 'block'; 
     }
 
     async function handleDrop(e, idx) { e.preventDefault(); const html = e.dataTransfer.getData('text/html'); const match = html.match(/src=["']([^"']+)["']/); if (match && match[1]) { const data = await fetchBase64(match[1]); if (data) setImage(idx, data); } else if (e.dataTransfer.files[0]) { const reader = new FileReader(); reader.onload = (ev) => setImage(idx, ev.target.result); reader.readAsDataURL(e.dataTransfer.files[0]); } }
-    function setImage(idx, data) { articles[idx].imgData = data; document.getElementById(`drop_${idx}`).innerHTML = `<img src="${data}">`; }
+    function setImage(idx, data) { window.articles[idx].imgData = data; document.getElementById(`drop_${idx}`).innerHTML = `<img src="${data}">`; }
     
     function generateFinal() { 
         const userTitleColor = document.getElementById('titleColor').value; 
@@ -350,7 +452,7 @@
         controls.innerHTML = ''; 
         let html = `<table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif; max-width:850px; margin:0 auto; background-color:#ffffff; border-collapse:collapse;"><tr><td>`; 
         let displayIdx = 0; 
-        articles.forEach((art, idx) => { 
+        window.articles.forEach((art, idx) => { 
             if (!art.selected) return; 
             const align = displayIdx % 2 === 0 ? "left" : "right"; 
             const bgColor = displayIdx % 2 === 0 ? "#ffffff" : "#ebf0f3"; 
@@ -364,8 +466,8 @@
         document.getElementById('final-section').style.display = 'block'; 
     }
     
-    function updateSize(idx, val) { articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 오리지널 V64 포맷 마스터링 디자인 복사가 완료되었습니다!"); }
+    function updateSize(idx, val) { window.articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 이중 방어 엔진 V65.2 포맷 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
