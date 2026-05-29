@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V64</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65.4</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -11,12 +11,13 @@
         .section-title { color: #D35400; border-bottom: 2px solid #D35400; padding-bottom: 8px; margin-top: 30px; font-weight: bold; }
         
         .ai-panel { background: #f0f7ff; border: 1px solid #b3d7ff; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
-        .ai-key-box { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; border-bottom: 1px dashed #b3d7ff; padding-bottom: 15px; }
-        .ai-key-box input { flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; }
+        .ai-key-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; border-bottom: 1px dashed #b3d7ff; padding-bottom: 15px; }
+        .ai-key-row { display: flex; gap: 10px; align-items: center; }
+        .ai-key-row input { flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; }
         
         .sub-step-box { background: white; border: 1px solid #cce2ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .sub-step-title { font-size: 14px; font-weight: bold; color: #00467F; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .ai-textarea { width: 100%; min-height: 120px; border: 1px solid #b3d7ff; border-radius: 6px; padding: 12px; box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.5; }
+        .ai-textarea { width: 100%; min-height: 100px; border: 1px solid #b3d7ff; border-radius: 6px; padding: 12px; box-sizing: border-box; font-size: 14px; resize: vertical; line-height: 1.5; }
 
         .config-panel { background: #f8f9fa; border: 1px solid #e1e8ed; padding: 20px; border-radius: 10px; margin-top: 20px; display: flex; gap: 30px; align-items: center; }
         .config-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; color: #2c3e50; }
@@ -33,7 +34,7 @@
             background: #fff; border: 1px solid #e1e8ed; border-radius: 8px; margin-bottom: 8px; 
         }
         .article-select-item input[type="checkbox"] { width: 22px; height: 22px; flex-shrink: 0; cursor: pointer; }
-        .title-text { flex: 1; font-weight: bold; font-size: 15px; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .title-text { font-weight: bold; font-size: 15px; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .image-drop-mini {
             width: 110px; height: 65px; border: 2px dashed #00467F; background: #f8f9fa;
@@ -58,31 +59,48 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 64.0 (Smart Fallback Router)</div>
+    <div class="ver">Version 65.4 (Advanced Search Grounding Engine)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
-    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (독립 기억 장치 탑재) 🤖</h3>
+    <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
     <div class="ai-panel">
         <div class="ai-key-box">
-            <span style="font-size: 13px; font-weight: bold; color: #333;">🔑 Gemini API Key:</span>
-            <input type="password" id="apiKey" placeholder="Google AI Studio에서 발급받은 무료 API Key를 입력하세요">
+            <div class="ai-key-row">
+                <span style="font-size: 13px; font-weight: bold; color: #333; width: 130px;">🔑 Gemini API Key:</span>
+                <input type="password" id="apiKey" placeholder="Google AI Studio에서 발급받은 유료 API Key를 입력하세요">
+            </div>
+            <div class="ai-key-row" style="margin-top: 8px;">
+                <span style="font-size: 13px; font-weight: bold; color: #00467F; width: 130px;">🌐 우선 검색 도메인:</span>
+                <input type="text" id="targetDomains" placeholder="예: iaea.org, world-nuclear.org, nei.org (쉼표나 띄어쓰기로 구분)">
+            </div>
+        </div>
+
+        <div class="sub-step-box" style="background-color: #fffdf0; border: 1px solid #ffeb3b;">
+            <div class="sub-step-title" style="color: #b78a00;">📋 [공통 적용 마스터 가이드] 문체 및 분량 절대 규칙 (영구 기억)</div>
+            <textarea id="aiPromptCommon" class="ai-textarea" style="min-height: 80px;" placeholder="모든 단계 추출 시 무조건 적용할 글자 수 분량 및 번역 스타일 지침을 입력하세요."></textarea>
         </div>
         
         <div class="sub-step-box">
-            <div class="sub-step-title">🛠️ Step 0-1. 원자력 신기술 / 신공법 가이드라인 (최대 5개 영구 기억)</div>
-            <textarea id="aiPromptTech" class="ai-textarea" placeholder="신기술/신공법 뉴스 수집 가이드를 입력하세요."></textarea>
+            <div class="sub-step-title">🛠️ Step 0-1. 1차 뉴스 가이드라인 (기사 3개 처음 추출)</div>
+            <textarea id="aiPrompt1" class="ai-textarea" placeholder="1차로 서칭 및 요약할 주제를 입력하세요 (예: 원자력 신기술/신공법 뉴스)."></textarea>
+            <button class="primary-btn" id="aiGenBtn1" style="background:#00467F; font-size:14px; padding:10px; margin-top:5px;" onclick="generateAIArticles(1)">0-1단계: 1차 뉴스 추출 시작 (기존 리셋) 🚀</button>
         </div>
 
         <div class="sub-step-box">
-            <div class="sub-step-title">💼 Step 0-2. 원자력 비즈니스 / 정책 가이드라인 (5개 영구 기억)</div>
-            <textarea id="aiPromptBiz" class="ai-textarea" placeholder="비즈니스/정책 뉴스 수집 가이드를 입력하세요."></textarea>
+            <div class="sub-step-title">💼 Step 0-2. 2차 뉴스 가이드라인 (기사 3개 이어서 빌드)</div>
+            <textarea id="aiPrompt2" class="ai-textarea" placeholder="2차로 연속 탐색하여 이어 붙일 주제를 입력하세요 (예: 원자력 비즈니스/정책 뉴스)."></textarea>
+            <button class="primary-btn" id="aiGenBtn2" style="background:#27ae60; font-size:14px; padding:10px; margin-top:5px;" onclick="generateAIArticles(2)">0-2단계: 2차 뉴스 이어 붙이기 💼</button>
         </div>
 
-        <button class="primary-btn" id="aiGenBtn" style="background:#00467F; font-size:16px; padding:14px;" onclick="generateDualAIArticles()">단계별 복합 검색 및 1단계 통합 주입 시작 🚀</button>
+        <div class="sub-step-box">
+            <div class="sub-step-title">🌐 Step 0-3. 3차 뉴스 가이드라인 (기사 3개 최종 누적)</div>
+            <textarea id="aiPrompt3" class="ai-textarea" placeholder="3차로 추가 서칭하여 최종 누적할 주제를 입력하세요 (예: 글로벌 Market 동향 및 SMR 라이선스 이슈)."></textarea>
+            <button class="primary-btn" id="aiGenBtn3" style="background:#8e44ad; font-size:14px; padding:10px; margin-top:5px;" onclick="generateAIArticles(3)">0-3단계: 3차 뉴스 최종 누적 🌐</button>
+        </div>
     </div>
     
     <h3 class="section-title">Step 1. 통합 기사 확인 및 정제 (최대 10개 표시창)</h3>
-    <div id="dropzone" contenteditable="true" placeholder="0단계의 복합 결과물 10개가 순서대로 이곳에 자동 통합 주입됩니다."></div>
+    <div id="dropzone" contenteditable="true" placeholder="0단계의 복합 분할 추출 결과물들이 순서대로 이곳에 오차 없이 자동 정렬되어 누적 주입됩니다."></div>
     <button class="primary-btn" onclick="parseArticles()">1단계: 통합 분석 및 제목 리스트 생성 🔍</button>
     
     <div id="selection-area" style="display:none; margin-top:20px;">
@@ -112,92 +130,200 @@
 
 <script>
     let articles = [];
+    window.articles = articles; 
 
     window.onload = function() {
         const savedKey = localStorage.getItem('plant_ti_gemini_key');
         if(savedKey) document.getElementById('apiKey').value = savedKey;
 
-        const savedTech = localStorage.getItem('plant_ti_gemini_prompt_tech');
-        if(savedTech) {
-            document.getElementById('aiPromptTech').value = savedTech;
+        const savedDomains = localStorage.getItem('plant_ti_target_domains');
+        if(savedDomains) {
+            document.getElementById('targetDomains').value = savedDomains;
         } else {
-            document.getElementById('aiPromptTech').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 '신기술 및 신공법' 기사를 최대 5개(부족하면 1~2개도 가능) 선정하라. 부족할 경우 범위를 넓혀 타 공식 보도자료에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
+            document.getElementById('targetDomains').value = `iaea.org, world-nuclear.org, nei.org, world-nuclear-news.org, power-eng.com, inl.gov, nucnet.org, ans.org, neimagazine.com`;
         }
 
-        const savedBiz = localStorage.getItem('plant_ti_gemini_prompt_biz');
-        if(savedBiz) {
-            document.getElementById('aiPromptBiz').value = savedBiz;
+        const savedCommon = localStorage.getItem('plant_ti_prompt_common');
+        if(savedCommon) {
+            document.getElementById('aiPromptCommon').value = savedCommon;
         } else {
-            document.getElementById('aiPromptBiz').value = `아래 지정된 9개 사이트를 최우선 검색하여 지난 2주 이내의 원자력 관련 '비즈니스 및 정책' 기사를 5개 선정하라. 부족할 경우 범위를 넓혀 타 공식 보도자료에서 보완하라.\n\n[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.\n\n[포맷]\n기사 1. [기사 제목]\n기사 날짜 : [MM월 DD일]\n\n[소제목]\n-. [상세한 개조식 본문 문장]\n[소제목]\n-. [상세한 개조식 본문 문장]\n\n기사 출처 : [여기에 기사 상세 페이지의 순수 URL 주소만 기입]\n\n[검색 대상 사이트]\nhttps://www.iaea.org\nhttps://www.world-nuclear.org\nhttps://www.nei.org\nhttps://www.world-nuclear-news.org\nhttps://www.power-eng.com/nuclear\nhttps://www.inl.gov\nhttps://www.nucnet.org\nhttps://www.ans.org/news\nhttps://www.neimagazine.com`;
+            document.getElementById('aiPromptCommon').value = `[필수 출력 규칙]\n1. 본문 기사 내용은 기존보다 2배 정도 길고 상세하게 작성하라.\n2. 각 기사 요약은 아래 [포맷]을 엄격히 준수하라.\n3. 기사의 제목은 절대 영어 원문 그대로 출력하지 말고, 핵심 내용을 파악하여 반드시 자연스럽고 가독성 좋은 한국어로 번역(의역)하여 출력하라.`;
         }
+
+        const savedPrompt1 = localStorage.getItem('plant_ti_prompt_1');
+        if(savedPrompt1) document.getElementById('aiPrompt1').value = savedPrompt1;
+        else document.getElementById('aiPrompt1').value = `지정된 사이트들을 최우선 검색하여 지난 2주 이내의 원자력 관련 '신기술 및 신공법' 기사를 정확히 3개 선정하라.`;
+
+        const savedPrompt2 = localStorage.getItem('plant_ti_prompt_2');
+        if(savedPrompt2) document.getElementById('aiPrompt2').value = savedPrompt2;
+        else document.getElementById('aiPrompt2').value = `지정된 사이트들을 최우선 검색하여 지난 2주 이내의 원자력 관련 '비즈니스 및 정책' 기사를 정확히 3개 선정하여 이어 붙여라.`;
+
+        const savedPrompt3 = localStorage.getItem('plant_ti_prompt_3');
+        if(savedPrompt3) document.getElementById('aiPrompt3').value = savedPrompt3;
+        else document.getElementById('aiPrompt3').value = `지정된 사이트들을 최우선 검색하여 지난 2주 이내의 '글로벌 SMR(소형 모듈 원자로) 프로젝트 및 라이선스 동향' 기사를 정확히 3개 선정하여 최종 누적하라.`;
     }
 
-    async function generateDualAIArticles() {
+    async function generateAIArticles(stage) {
         const apiKey = document.getElementById('apiKey').value.trim();
-        const promptTech = document.getElementById('aiPromptTech').value.trim();
-        const promptBiz = document.getElementById('aiPromptBiz').value.trim();
+        const targetDomains = document.getElementById('targetDomains').value.trim();
+        const promptCommon = document.getElementById('aiPromptCommon').value.trim();
+        const promptStage = document.getElementById('aiPrompt' + stage).value.trim();
         
         if(!apiKey) { alert("Gemini API Key를 입력해주세요."); return; }
-        if(!promptTech || !promptBiz) { alert("0-1단계와 0-2단계 가이드라인을 모두 입력해주세요."); return; }
+        if(!targetDomains) { alert("우선 검색할 도메인 주소를 입력해주세요."); return; }
+        if(!promptStage) { alert(`Step 0-${stage} 가이드라인을 입력해주세요.`); return; }
         
         localStorage.setItem('plant_ti_gemini_key', apiKey);
-        localStorage.setItem('plant_ti_gemini_prompt_tech', promptTech);
-        localStorage.setItem('plant_ti_gemini_prompt_biz', promptBiz);
+        localStorage.setItem('plant_ti_target_domains', targetDomains);
+        localStorage.setItem('plant_ti_prompt_common', promptCommon);
+        localStorage.setItem('plant_ti_prompt_' + stage, promptStage);
         
-        const btn = document.getElementById('aiGenBtn');
+        const btn = document.getElementById('aiGenBtn' + stage);
+        const originalBtnText = btn.innerText;
         btn.disabled = true;
-        document.getElementById('dropzone').innerText = "";
+        
+        const drop = document.getElementById('dropzone');
+        
+        // 🛠️ [실시간 날짜 동적 연산 도입] 매 요청 시점의 날짜를 동적으로 획득
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        const currentDay = now.getDate();
+        const formattedToday = `${currentYear}년 ${currentMonth}월 ${currentDay}일`;
 
-        // 💡 핵심 수정: 9개 사이트를 최우선으로 하되, 기사가 부족할 경우 다른 공식 전문 매체 검색을 허용하는 계율 밸런싱
+        let currentText = (stage === 1) ? "" : (drop.innerText || "");
+        let matches = currentText.match(/기사\s*\d+\./g) || [];
+        let baseCount = matches.length;
+
+        // 🛡️ [도메인 우선순위 철저 통제 설계 수립]
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
         
-        ⚠️ [검색 우선순위 및 유연한 폴백(Fallback) 지침]
-        1. [1순위 최우선 검색]: 사용자가 제시한 아래 9개 도메인을 가장 먼저, 집중적으로 탐색하여 뉴스를 선별하라.
-           - iaea.org, world-nuclear.org, nei.org, world-nuclear-news.org, power-eng.com, inl.gov, nucnet.org, ans.org, neimagazine.com
-        2. [2순위 확장 검색]: 만약 지정된 9개 사이트에서 지난 2주 이내의 최신 기사나 조건에 맞는 본문 분량이 충족되지 않거나 부족한 경우에 한해서, 범위를 확장하여 IAEA, WNA, 각국 원자력청 공식 보도자료 및 공신력 있는 글로벌 에너지 전문 매체(구글 라이브 검색 활용)에서 관련 뉴스를 추가 발굴하여 보완하라.
-        3. 공신력 없는 일반 개인 블로그, 카페, 위키백과 등의 정보는 타 사이트 확장 시에도 철저히 배제하라.
+        📅 [중요: 실시간 날짜 동기화 및 타임라인 고정]
+        - 오늘의 실제 정확한 날짜는 무조건 ** ${formattedToday} ** 이다.
+        - 너는 기존에 기억하고 있는 과거 내부 지식(Memory)을 절대 활용하지 마라. 반드시 제공된 구글 검색 도구(googleSearch)의 웹 브라우징 결과만 분석하여 가공해야 한다.
+
+        🔒 [날짜 필터 및 최신성 가중치 규칙]
+        1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday}) 기준으로 역산하여 '지난 14일(2주) 이내'인 ${currentYear}년 ${currentMonth}월에 발행된 뉴스만 수집하라. 과거 연도의 철 지난 옛날 기사는 절대로 단 한 개도 가져오지 마라.
+        2. [최신성 우선순위]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜인 ${formattedToday}에 가장 가까운 최신 기사일수록 가중치를 대단히 높게 두어 우선 선별하라.
+
+        🔒 [🚨 우선 타겟 도메인 검색 강제화 규칙 - 절대 타협 금지]
+        1. 너는 구글 검색(googleSearch)을 수행할 때 반드시 사용자가 지정한 도메인 목록(** ${targetDomains} **) 내에 실린 기사를 1순위로 탐색하여 출력해야 한다.
+        2. [사이트 타겟팅 쿼리화]: 검색 도구를 호출할 때 검색어에 지정 도메인 전용 한정 수식어(예: 'site:world-nuclear-news.org', 'site:iaea.org', 'site:nei.org' 등)를 명시적으로 결합하여 검색하라.
+        3. [외부 도메인 차단 장치]: 'world-nuclear-news.org' 등 지정 도메인에 훌륭하고 풍부한 정보가 존재함에도 불구하고, 'energy.gov' 등 외부 임의 사이트로 건너뛰어 기사를 채워 넣는 행동은 불성실한 가공 행위로 보아 불이익을 받는다.
+        4. [최후의 보루 규칙]: 지정된 전체 도메인을 이 잡듯 샅샅이 뒤져봤음에도 지난 2주 이내의 부합하는 기사가 '전무한' 불가피한 상황에서만 예외적으로 신뢰할 수 있는 외부 공공 에너지 기관 도메인의 검색과 수집을 허용한다. 이때도 무조건 지정된 도메인을 최우선으로 복원하려 노력해야 한다.
+
+        🔒 [🚨 URL 무결성 지침]
+        1. '기사 출처 :' 뒤에 적는 모든 URL 주소는 검색 결과에 나온 풀 주소(Full URL) 그대로 한 글자도 빠짐없이 완벽하게 출력하라.
+        2. 중간에 자르거나 축약하지 말고 맨 뒤 파라미터까지 전부 끝까지 받아 적어야 한다.
         
-        기사 출처 URL을 절대 상상해서 적지 말고 검색된 진짜 주소를 그대로 대소문자 구별해 복사 붙여넣기 하라. 주소 뒤에 [1], [2] 같은 각주 기호를 절대 붙이지 마라.
-        반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라.
+        반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 부연적인 인삿말은 모두 생략하라.
+        영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
 
         [포맷]
         기사 1. [한국어로 번역된 기사 제목]
         기사 날짜 : [MM월 DD일]
+        영어 원문 제목 : [원본 기사의 오리지널 영어 제목]
         [소제목]
         -. [상세하고 길게 작성된 개조식 본문 문장]
         기사 출처 : [순수 URL]`;
 
+        const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 지정 도메인(${targetDomains})의 데이터 검색에 온전히 집중하여 기사를 정확히 3개만 추출하라.`;
+
         try {
-            btn.innerText = "⏳ [1/2단계] 9개 사이트 기반 신공법 뉴스 서칭 중 (부족 시 공식 매체 확장)...";
-            const techText = await callGeminiAPI(apiKey, promptTech, systemInstructionCommon + "\n너는 원자력 '신기술 및 신공법' 관련 뉴스를 추출해야 한다.");
+            btn.innerText = `⏳ [0-${stage}단계 진행중] 공통지침 반영 및 최신 뉴스 3개 정밀 분석 중...`;
+            const data = await callGeminiAPI(apiKey, combinedPrompt, systemInstructionCommon);
             
-            const techMatches = techText.match(/기사\s*\d+\./g) || [];
-            const techCount = techMatches.length;
+            if (!data.candidates || !data.candidates[0]) {
+                throw new Error("Gemini API로부터 올바른 응답을 받지 못했습니다. API Key나 쿼리를 점검하세요.");
+            }
 
-            btn.innerText = `⏳ [2/2단계] 9개 사이트 기반 비즈니스 뉴스 서칭 중... (신공법 ${techCount}개 확보)`;
-            const bizText = await callGeminiAPI(apiKey, promptBiz, systemInstructionCommon + "\n너는 원자력 '비즈니스 및 정책' 관련 뉴스를 추출해야 한다.");
+            let rawOutputText = data.candidates[0].content.parts[0].text;
+            const groundingChunks = data.candidates[0].groundingMetadata?.groundingChunks || [];
 
-            let processedBizText = bizText.replace(/기사\s*(\d+)\./g, function(match, num) {
-                return `기사 ${parseInt(num) + techCount}.`;
+            if (groundingChunks.length > 0) {
+                let articleBlocks = rawOutputText.split(/(?=기사\s*\d+\.)/);
+                for (let i = 0; i < articleBlocks.length; i++) {
+                    let block = articleBlocks[i];
+                    if (!block.trim().startsWith('기사')) continue;
+                    
+                    let engTitleMatch = block.match(/(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：]\s*(.*)/i);
+                    let engTitle = engTitleMatch ? engTitleMatch[1].replace(/[\[\]]/g, "").trim() : "";
+                    
+                    let srcLineMatch = block.match(/(기사\s*출처\s*[:：]\s*)(.*)/i);
+                    
+                    if (engTitle && srcLineMatch) {
+                        let currentUrlValue = srcLineMatch[2].trim();
+                        let approxUrl = currentUrlValue.startsWith('http') ? currentUrlValue.split(/\s+/)[0] : "";
+                        
+                        let bestUrl = findBestGroundingUrl(engTitle, approxUrl, groundingChunks);
+                        if (bestUrl) {
+                            block = block.replace(srcLineMatch[0], srcLineMatch[1] + bestUrl);
+                            articleBlocks[i] = block;
+                        }
+                    }
+                }
+                rawOutputText = articleBlocks.join('');
+            }
+
+            let processedText = rawOutputText.replace(/기사\s*(\d+)\./g, function(match, num) {
+                return `기사 ${parseInt(num) + baseCount}.`;
             });
 
-            const finalCombinedText = techText.trim() + "\n\n" + processedBizText.trim();
-            document.getElementById('dropzone').innerText = finalCombinedText;
+            if (stage === 1) {
+                drop.innerText = rawOutputText.trim();
+            } else {
+                drop.innerText = (drop.innerText.trim() ? drop.innerText.trim() + "\n\n" : "") + processedText.trim();
+            }
             
-            alert(`🤖 복합 정밀 검색 완료!\n조건에 부합하는 원고들이 1단계 창에 성공적으로 통합 주입되었습니다.`);
+            alert(`🤖 0-${stage}단계 추출 및 연동 성공!\n현재까지 총 ${(drop.innerText.match(/기사\s*\d+\./g) || []).length}개의 기사가 오차 없이 누적 주입되었습니다.`);
             parseArticles(); 
             
         } catch (e) {
             alert("기사 추출 연동 중 오류가 발생했습니다. Key 설정이나 네트워크를 확인하세요.");
             console.error(e);
         } finally {
-            btn.innerText = "단계별 복합 검색 및 1단계 통합 주입 시작 🚀";
+            btn.innerText = originalBtnText;
             btn.disabled = false;
         }
     }
 
+    function findBestGroundingUrl(engTitle, hallucinatedUrl, groundingChunks) {
+        if (!groundingChunks || groundingChunks.length === 0) return null;
+        let bestUrl = null;
+        let maxScore = -1;
+        const getKeywords = (str) => {
+            if (!str) return [];
+            return str.toLowerCase().replace(/[^a-z0-9가-힣\s]/g, ' ').split(/\s+/).filter(w => w.length > 1);
+        };
+        const titleKeywords = getKeywords(engTitle);
+        let targetDomain = "";
+        if (hallucinatedUrl && hallucinatedUrl.startsWith('http')) {
+            try { targetDomain = new URL(hallucinatedUrl).hostname.replace('www.', ''); } catch(e) {}
+        }
+        for (const chunk of groundingChunks) {
+            if (!chunk.web || !chunk.web.uri) continue;
+            let chunkUrl = chunk.web.uri;
+            let chunkTitle = chunk.web.title || "";
+            let score = 0;
+            if (targetDomain) {
+                try {
+                    let chunkDomain = new URL(chunkUrl).hostname.replace('www.', '');
+                    if (chunkDomain.includes(targetDomain) || targetDomain.includes(chunkDomain)) { score += 20; }
+                } catch(e) {}
+            }
+            const chunkTitleKeywords = getKeywords(chunkTitle);
+            let matchCount = 0;
+            titleKeywords.forEach(kw => {
+                if (chunkTitleKeywords.includes(kw) || chunkUrl.toLowerCase().includes(kw)) { matchCount++; }
+            });
+            score += matchCount * 10;
+            if (score > maxScore && score > 0) { maxScore = score; bestUrl = chunkUrl; }
+        }
+        return bestUrl;
+    }
+
     async function callGeminiAPI(key, prompt, systemInstruction) {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${key}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -206,20 +332,154 @@
                 tools: [{"googleSearch": {}}] 
             })
         });
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
+        return await response.json();
     }
 
-    document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.getRangeAt(0).insertNode(textNode); selection.collapseToEnd(); });
-    function cleanUrl(url) { if (!url) return "#"; let cleaned = url.split(/[\[\s\]]/)[0]; return cleaned.trim(); }
+    // 🌐 [고도화 반영 패치] 구글 정밀 타겟 고급 연산자 조립기 구현
+    function buildSearchUrl(title, source, date) {
+        let query = `"${title}"`; // 제목 완벽 일치 연산 장착
+        
+        // 출처 텍스트에서 도메인 추출 알고리즘 가동
+        if (source && (source.includes('.') || source.includes('org') || source.includes('com'))) {
+            let domain = source.replace(/https?:\/\/(www\.)?/, '').split('/')[0].trim();
+            if (domain && !domain.includes(' ') && domain.length < 50) {
+                query += ` site:${domain}`; // 도메인 폐쇄 검색 연산 장착
+            } else if (source.length < 30) {
+                query += ` "${source}"`;
+            }
+        }
+        return `https://www.google.com/search?q=${encodeURIComponent(query.trim())}`;
+    }
+
+    document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.collapseToEnd(); });
+    
+    function cleanUrl(url) { 
+        if (!url) return "#"; 
+        let cleaned = url.split(/[\[\s\]"']/)[0]; 
+        return cleaned.replace(/[.,;:)\s]+$/, "").trim(); 
+    }
+    
     function openNewWindow(url) { const cleanedUrl = cleanUrl(url); window.open(cleanedUrl, '_blank', `width=1100,height=850,resizable=yes,scrollbars=yes,status=yes`); }
-    function parseArticles() { const dropzone = document.getElementById('dropzone'); const rawText = dropzone.innerText || dropzone.textContent; const blocks = rawText.split(/기사\s*\d+\./); articles = []; for (let i = 1; i < blocks.length; i++) { let block = blocks[i].trim(); let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0); let firstLine = lines[0] || "제목 없음"; let cleanTitle = firstLine.replace(/^(제목\s*[:：]\s*)/i, "").replace(/[\[\]]/g, "").trim(); let dateMatch = block.match(/(\d{1,2}월\s*\d{1,2}일)/); let date = dateMatch ? `[${dateMatch[0]}]` : ""; let url = "#"; let urlMatch = block.match(/기사\s*출처\s*[:：]\s*(https?:\/\/[^\s\]<>"]+)/i); if (urlMatch) { url = cleanUrl(urlMatch[1]); } else { let fallbackMatch = block.match(/https?:\/\/[^\s\]<>"]+/); if (fallbackMatch) url = cleanUrl(fallbackMatch[0]); } let contentLines = lines.slice(1); const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:：][\s\S]*/gi ]; let contentText = contentLines.join('\n'); garbagePatterns.forEach(p => contentText = contentText.replace(p, "")); let contentHtml = contentText.split('\n') .filter(line => line.trim().length > 0) .map(line => { let formattedLine = line.replace(/(\[.*?\])/g, "<b>$1</b>"); return `<p style="margin:0 0 10px 0; font-family:'맑은 고딕',sans-serif; font-size:15px; color:#333333; line-height:1.7;">${formattedLine}</p>`; }).join(''); articles.push({ title: cleanTitle, date: date, url: url, contentHtml: contentHtml, imgData: "", selected: true, imgWidth: 320 }); } renderSelection(); }
-    function renderSelection() { const list = document.getElementById('selection-list'); list.innerHTML = ''; articles.forEach((art, idx) => { const item = document.createElement('div'); item.className = 'article-select-item'; item.innerHTML = ` <input type="checkbox" checked onchange="articles[${idx}].selected = this.checked"> <div class="title-text">${idx+1}. ${art.title}</div> <button class="btn-new-tab" onclick="openNewWindow('${art.url}')">기사 그림 가져오기 🔗</button> <div class="image-drop-mini" id="drop_${idx}" ondragover="event.preventDefault();" ondrop="handleDrop(event, ${idx})">그림 던지기</div> `; list.appendChild(item); }); document.getElementById('selection-area').style.display = 'block'; }
+    
+    function parseArticles() { 
+        const dropzone = document.getElementById('dropzone'); 
+        const rawText = dropzone.innerText || dropzone.textContent; 
+        const blocks = rawText.split(/기사\s*\d+\./); 
+        
+        articles.length = 0; 
+        
+        for (let i = 1; i < blocks.length; i++) { 
+            let block = blocks[i].trim(); 
+            let lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0); 
+            
+            let firstLine = lines[0] || "제목 없음"; 
+            let cleanTitle = firstLine.replace(/^(제목\s*[:：]\s*)/i, "").replace(/[\[\]]/g, "").trim(); 
+            let dateMatch = block.match(/(\d{1,2}월\s*\d{1,2}일)/); 
+            let date = dateMatch ? `[${dateMatch[0]}]` : ""; 
+            
+            let engTitleMatch = block.match(/(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：]\s*(.*)/i);
+            let engTitle = engTitleMatch ? engTitleMatch[1].replace(/[\[\]]/g, "").trim() : cleanTitle;
+
+            let sourceMatch = block.match(/기사\s*출처\s*[:：]\s*([^\n]+)/i);
+            let source = sourceMatch ? sourceMatch[1].trim() : "";
+
+            let url = "#"; 
+            let urlMatch = block.match(/https?:\/\/[^\s\]<> "']+/g); 
+
+            if (urlMatch && urlMatch.length > 0) {
+                let sourceUrlMatch = source.match(/https?:\/\/[^\s\]<> "']+/);
+                if (sourceUrlMatch) {
+                    url = cleanUrl(sourceUrlMatch[0]);
+                } else {
+                    url = cleanUrl(urlMatch[urlMatch.length - 1]);
+                }
+            } 
+
+            // 주소가 유효하지 않거나 깨진 문자열이면 고도화된 연산자 조합 검색창 링크로 Fallback 빌드
+            if (!url.startsWith("http")) {
+                url = buildSearchUrl(engTitle, source, date);
+            }
+            
+            let contentLines = lines.slice(1); 
+            const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:::]\s*[\s\S]*/gi, /(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：][^\n]*/gi ]; 
+            let contentText = contentLines.join('\n'); 
+            garbagePatterns.forEach(p => contentText = contentText.replace(p, "")); 
+            
+            let contentHtml = contentText.split('\n') 
+                .filter(line => line.trim().length > 0) 
+                .map(line => { 
+                    let text = line.trim();
+                    if (!text.startsWith('-.')) {
+                        let innerSubTitle = text.replace(/[\[\]]/g, "").trim();
+                        text = `<b>[${innerSubTitle}]</b>`;
+                    } else {
+                        text = text.replace(/(\[.*?\])/g, "<b>$1</b>");
+                    }
+                    return `<p style="margin:0 0 10px 0; font-family:'맑은 고딕',sans-serif; font-size:15px; color:#333333; line-height:1.7;">${text}</p>`; 
+                }).join(''); 
+                
+            articles.push({ title: cleanTitle, engTitle: engTitle, date: date, url: url, contentHtml: contentHtml, imgData: "", selected: true, imgWidth: 320 }); 
+        } 
+        renderSelection(); 
+    }
+
+    function renderSelection() { 
+        const list = document.getElementById('selection-list'); 
+        list.innerHTML = ''; 
+        
+        articles.forEach((art, idx) => { 
+            const isFallback = art.url.startsWith('https://www.google.com/search');
+            const urlInputStyle = isFallback ? "flex: 1; padding: 6px; border: 2px solid #e67e22; border-radius: 4px; font-size: 13px; background-color: #fff5eb;" : "flex: 1; padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;";
+            
+            const item = document.createElement('div');
+            item.className = 'article-select-item';
+            item.innerHTML = ` 
+                <input type="checkbox" checked onchange="window.articles[${idx}].selected = this.checked"> 
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0;">
+                    <div class="title-text">${idx+1}. ${art.title} ${isFallback ? "<span style='color:#e67e22; font-size:11px;'>[⚠️ 검색 Fallback 주입됨]</span>" : ""}</div>
+                    <div style="font-size: 13px; color: #666; font-style: italic; padding-left: 2px;">영문 원문 Title: ${art.engTitle}</div>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                        <button class="btn-new-tab" onclick="openNewWindow(window.articles[${idx}].url)">기사 그림 가져오기 🔗</button>
+                        <button class="btn-new-tab" style="background-color: #e67e22;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent('&quot;' + window.articles[${idx}].engTitle + '&quot;'), '_blank')">제목 검색 🔍</button>
+                        <input type="text" value="${art.url}" style="${urlInputStyle}" onchange="window.articles[${idx}].url = this.value" placeholder="진짜 주소를 찾아 여기에 붙여넣으세요">
+                    </div>
+                </div>
+                <div class="image-drop-mini" id="drop_${idx}" ondragover="event.preventDefault();" ondrop="handleDrop(event, ${idx})">그림 던지기</div> 
+            `; 
+            list.appendChild(item);
+        }); 
+        document.getElementById('selection-area').style.display = 'block'; 
+    }
+
     async function handleDrop(e, idx) { e.preventDefault(); const html = e.dataTransfer.getData('text/html'); const match = html.match(/src=["']([^"']+)["']/); if (match && match[1]) { const data = await fetchBase64(match[1]); if (data) setImage(idx, data); } else if (e.dataTransfer.files[0]) { const reader = new FileReader(); reader.onload = (ev) => setImage(idx, ev.target.result); reader.readAsDataURL(e.dataTransfer.files[0]); } }
-    function setImage(idx, data) { articles[idx].imgData = data; document.getElementById(`drop_${idx}`).innerHTML = `<img src="${data}">`; }
-    function generateFinal() { const userTitleColor = document.getElementById('titleColor').value; const userBtnColor = document.getElementById('btnColor').value; const userBtnTextColor = document.getElementById('btnTextColor').value; const result = document.getElementById('outlook-result'); const controls = document.getElementById('size-controls'); controls.innerHTML = ''; let html = `<table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif; max-width:850px; margin:0 auto; background-color:#ffffff; border-collapse:collapse;"><tr><td>`; let displayIdx = 0; articles.forEach((art, idx) => { if (!art.selected) return; const align = displayIdx % 2 === 0 ? "left" : "right"; const bgColor = displayIdx % 2 === 0 ? "#ffffff" : "#ebf0f3"; const borderColor = "#dce1e6"; controls.innerHTML += ` <div class="size-control-card"> <strong style="color:#2c3e50; width:130px;">기사 ${displayIdx+1} 그림 크기:</strong>  <input type="range" min="150" max="600" value="${art.imgWidth}" oninput="updateSize(${idx}, this.value)" style="flex:1;"> <span id="val_${idx}" style="font-weight:bold; width:60px; color:${userTitleColor};">${art.imgWidth}px</span> </div>`; html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" align="${align}" hspace="25" vspace="10" border="0" style="display:inline-block; border-radius:10px; margin-${align === 'left' ? 'right' : 'left'}:25px; height:auto;">` : ""} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; displayIdx++; }); html += `</td></tr></table>`; result.innerHTML = html; document.getElementById('final-section').style.display = 'block'; }
-    function updateSize(idx, val) { articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 통합 디자인 복사가 완료되었습니다!"); }
+    function setImage(idx, data) { window.articles[idx].imgData = data; document.getElementById(`drop_${idx}`).innerHTML = `<img src="${data}">`; }
+    
+    function generateFinal() { 
+        const userTitleColor = document.getElementById('titleColor').value; 
+        const userBtnColor = document.getElementById('btnColor').value; 
+        const userBtnTextColor = document.getElementById('btnTextColor').value; 
+        const result = document.getElementById('outlook-result'); 
+        const controls = document.getElementById('size-controls'); 
+        controls.innerHTML = ''; 
+        let html = `<table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif; max-width:850px; margin:0 auto; background-color:#ffffff; border-collapse:collapse;"><tr><td>`; 
+        let displayIdx = 0; 
+        window.articles.forEach((art, idx) => { 
+            if (!art.selected) return; 
+            const align = displayIdx % 2 === 0 ? "left" : "right"; 
+            const bgColor = displayIdx % 2 === 0 ? "#ffffff" : "#ebf0f3"; 
+            const borderColor = "#dce1e6"; 
+            controls.innerHTML += ` <div class="size-control-card"> <strong style="color:#2c3e50; width:130px;">기사 ${displayIdx+1} 그림 크기:</strong>  <input type="range" min="150" max="600" value="${art.imgWidth}" oninput="updateSize(${idx}, this.value)" style="flex:1;"> <span id="val_${idx}" style="font-weight:bold; width:60px; color:${userTitleColor};">${art.imgWidth}px</span> </div>`; 
+            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" align="${align}" hspace="25" vspace="10" border="0" style="display:inline-block; border-radius:10px; margin-${align === 'left' ? 'right' : 'left'}:25px; height:auto;">` : ""} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
+            displayIdx++; 
+        }); 
+        html += `</td></tr></table>`; 
+        result.innerHTML = html; 
+        document.getElementById('final-section').style.display = 'block'; 
+    }
+    
+    function updateSize(idx, val) { window.articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.4 어드밴스드 엔진 포맷 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
