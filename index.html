@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V65.3</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65.4</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -59,7 +59,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 65.3 (Reference Integrity Patch)</div>
+    <div class="ver">Version 65.4 (Advanced Search Grounding Engine)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
@@ -183,31 +183,36 @@
         btn.disabled = true;
         
         const drop = document.getElementById('dropzone');
+        
+        // 🛠️ [실시간 날짜 동적 연산 도입] 매 요청 시점의 날짜를 동적으로 획득
         const now = new Date();
-        const formattedToday = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        const currentDay = now.getDate();
+        const formattedToday = `${currentYear}년 ${currentMonth}월 ${currentDay}일`;
 
         let currentText = (stage === 1) ? "" : (drop.innerText || "");
         let matches = currentText.match(/기사\s*\d+\./g) || [];
         let baseCount = matches.length;
 
+        // 🛡️ [날짜 앵커 강화 패치] 내부 메모리를 차단하고 실시간 동기화 강제 유도
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
         
-        📅 [중요: 실시간 날짜 동기화 및 타임라인 앵커]
-        - 오늘의 실제 정확한 날짜는 ** ${formattedToday} ** 이다. 너는 이 날짜를 검색의 완벽한 시간적 기준점으로 삼아야 한다.
+        📅 [중요: 실시간 날짜 동기화 및 타임라인 고정]
+        - 오늘의 실제 정확한 날짜는 무조건 ** ${formattedToday} ** 이다.
+        - 너는 기존에 기억하고 있는 과거 내부 지식(Memory)을 절대 활용하지 마라. 반드시 제공된 구글 검색 도구(googleSearch)의 웹 브라우징 결과만 분석하여 가공해야 한다.
 
-        🔒 [날짜 필터 및 최신성 가중치(Recency Bias) 절대 규칙]
-        1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday})를 기준으로 정확히 역산하여 '지난 14일(2주) 이내'에 발행된 뉴스만 수집하라. 오늘로부터 14일 이전의 철 지난 과거 기사는 정보 가치가 없으므로 절대로 단 한 개도 가져오지 마라.
-        2. [🔥 최신성 우선순위 부과]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜에 가장 가깝고 가장 최신인 기사일수록 가중치와 중요도를 대단히 높게 두어 우선 선별하라. 최종 출력 순서 또한 가장 오늘에 가까운 최신순으로 정렬하여 배치하라.
+        🔒 [날짜 필터 및 최신성 가중치 규칙]
+        1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday}) 기준으로 역산하여 '지난 14일(2주) 이내'인 ${currentYear}년 ${currentMonth}월에 발행된 뉴스만 수집하라. 과거 연도의 철 지난 옛날 기사는 절대로 단 한 개도 가져오지 마라.
+        2. [최신성 우선순위]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜인 ${formattedToday}에 가장 가까운 최신 기사일수록 가중치를 대단히 높게 두어 우선 선별하라.
 
-        🔒 [🚨 URL 무결성 및 절대 보장 지침 - 위반 절대 금지]
+        🔒 [🚨 URL 무결성 지침]
         1. '기사 출처 :' 뒤에 적는 모든 URL 주소는 검색 결과에 나온 풀 주소(Full URL) 그대로 한 글자도 빠짐없이 완벽하게 출력하라.
-        2. 하이픈(-)이나 단어 슬러그가 아무리 길어지더라도 절대로 중간에 자르거나 축약하지 마라. 맨 뒤 세부 파일명과 파라미터까지 전부 끝까지 받아 적어야 한다.
-        3. 주소 문자열을 가공, 편집, 압축하지 말고 원형 그대로 출력하라. 주소 뒤에 문장 부호 마침표(.)나 각주 부호 [1], [2] 등을 절대로 붙이지 마라.
+        2. 중간에 자르거나 축약하지 말고 맨 뒤 파라미터까지 전부 끝까지 받아 적어야 한다.
 
         🔒 [도메인 검색 가중치 원칙]
-        1. [🥇 최최우선 검색]: 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저, 가장 집중적으로 샅샅이 탐색하여 요건에 맞는 뉴스를 선별해야 한다.
+        1. 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저 탐색하여 뉴스를 선별해야 한다.
            - 대상 도메인 목록: ${targetDomains}
-        2. [⚠️ 제한적 확장 폴백]: 오직 위에 지정된 사이트에서 조건에 맞는 소스가 '정말로 존재하지 않아 기사 추출이 완전히 불가능한 비상 상황'일 때에만 예외적으로 범위를 확장하라. 확장 시에는 신뢰할 수 있는 전 세계 관련 정부 기관 사이트(예: .gov) 또는 공인된 단체의 공식 보도자료실 내부로만 제한하며, 일반 뉴스 언론사나 개인 블로그 사이트는 철저히 차단하라.
         
         반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 부연적인 인삿말은 모두 생략하라.
         영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
@@ -328,12 +333,19 @@
         return await response.json();
     }
 
+    // 🌐 [고도화 반영 패치] 구글 정밀 타겟 고급 연산자 조립기 구현
     function buildSearchUrl(title, source, date) {
-        let cleanSource = source.replace(/https?:\/\/[^\s]+/g, "").trim(); 
-        let cleanDate = date ? date.replace(/[\[\]]/g, "").trim() : "";
-        let query = `${title}`;
-        if (cleanSource && cleanSource.length < 50) query += ` ${cleanSource}`;
-        if (cleanDate) query += ` ${cleanDate}`;
+        let query = `"${title}"`; // 제목 완벽 일치 연산 장착
+        
+        // 출처 텍스트에서 도메인 추출 알고리즘 가동
+        if (source && (source.includes('.') || source.includes('org') || source.includes('com'))) {
+            let domain = source.replace(/https?:\/\/(www\.)?/, '').split('/')[0].trim();
+            if (domain && !domain.includes(' ') && domain.length < 50) {
+                query += ` site:${domain}`; // 도메인 폐쇄 검색 연산 장착
+            } else if (source.length < 30) {
+                query += ` "${source}"`;
+            }
+        }
         return `https://www.google.com/search?q=${encodeURIComponent(query.trim())}`;
     }
 
@@ -352,7 +364,6 @@
         const rawText = dropzone.innerText || dropzone.textContent; 
         const blocks = rawText.split(/기사\s*\d+\./); 
         
-        // ✨ [참조 무결성 패치]: 주소 연결고리를 깨지 않고 내부만 청소
         articles.length = 0; 
         
         for (let i = 1; i < blocks.length; i++) { 
@@ -382,12 +393,13 @@
                 }
             } 
 
+            // 주소가 유효하지 않거나 깨진 문자열이면 고도화된 연산자 조합 검색창 링크로 Fallback 빌드
             if (!url.startsWith("http")) {
                 url = buildSearchUrl(engTitle, source, date);
             }
             
             let contentLines = lines.slice(1); 
-            const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:：]\s*[\s\S]*/gi, /(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：][^\n]*/gi ]; 
+            const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:::]\s*[\s\S]*/gi, /(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：][^\n]*/gi ]; 
             let contentText = contentLines.join('\n'); 
             garbagePatterns.forEach(p => contentText = contentText.replace(p, "")); 
             
@@ -417,7 +429,6 @@
             const isFallback = art.url.startsWith('https://www.google.com/search');
             const urlInputStyle = isFallback ? "flex: 1; padding: 6px; border: 2px solid #e67e22; border-radius: 4px; font-size: 13px; background-color: #fff5eb;" : "flex: 1; padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;";
             
-            // ✨ [안정성 패치]: 이벤트 오동작을 방지하는 표준 Vanilla DOM 빌드 방식 구현
             const item = document.createElement('div');
             item.className = 'article-select-item';
             item.innerHTML = ` 
@@ -466,7 +477,7 @@
     }
     
     function updateSize(idx, val) { window.articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ 이중 방어 엔진 V65.3 패치 버전 복사가 완료되었습니다!"); }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.4 어드밴스드 엔진 포맷 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
