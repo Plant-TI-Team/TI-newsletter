@@ -195,7 +195,7 @@
         let matches = currentText.match(/기사\s*\d+\./g) || [];
         let baseCount = matches.length;
 
-        // 🛡️ [날짜 앵커 강화 패치] 내부 메모리를 차단하고 실시간 동기화 강제 유도
+        // 🛡️ [도메인 우선순위 철저 통제 설계 수립]
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
         
         📅 [중요: 실시간 날짜 동기화 및 타임라인 고정]
@@ -206,13 +206,15 @@
         1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday}) 기준으로 역산하여 '지난 14일(2주) 이내'인 ${currentYear}년 ${currentMonth}월에 발행된 뉴스만 수집하라. 과거 연도의 철 지난 옛날 기사는 절대로 단 한 개도 가져오지 마라.
         2. [최신성 우선순위]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜인 ${formattedToday}에 가장 가까운 최신 기사일수록 가중치를 대단히 높게 두어 우선 선별하라.
 
+        🔒 [🚨 우선 타겟 도메인 검색 강제화 규칙 - 절대 타협 금지]
+        1. 너는 구글 검색(googleSearch)을 수행할 때 반드시 사용자가 지정한 도메인 목록(** ${targetDomains} **) 내에 실린 기사를 1순위로 탐색하여 출력해야 한다.
+        2. [사이트 타겟팅 쿼리화]: 검색 도구를 호출할 때 검색어에 지정 도메인 전용 한정 수식어(예: 'site:world-nuclear-news.org', 'site:iaea.org', 'site:nei.org' 등)를 명시적으로 결합하여 검색하라.
+        3. [외부 도메인 차단 장치]: 'world-nuclear-news.org' 등 지정 도메인에 훌륭하고 풍부한 정보가 존재함에도 불구하고, 'energy.gov' 등 외부 임의 사이트로 건너뛰어 기사를 채워 넣는 행동은 불성실한 가공 행위로 보아 불이익을 받는다.
+        4. [최후의 보루 규칙]: 지정된 전체 도메인을 이 잡듯 샅샅이 뒤져봤음에도 지난 2주 이내의 부합하는 기사가 '전무한' 불가피한 상황에서만 예외적으로 신뢰할 수 있는 외부 공공 에너지 기관 도메인의 검색과 수집을 허용한다. 이때도 무조건 지정된 도메인을 최우선으로 복원하려 노력해야 한다.
+
         🔒 [🚨 URL 무결성 지침]
         1. '기사 출처 :' 뒤에 적는 모든 URL 주소는 검색 결과에 나온 풀 주소(Full URL) 그대로 한 글자도 빠짐없이 완벽하게 출력하라.
         2. 중간에 자르거나 축약하지 말고 맨 뒤 파라미터까지 전부 끝까지 받아 적어야 한다.
-
-        🔒 [도메인 검색 가중치 원칙]
-        1. 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저 탐색하여 뉴스를 선별해야 한다.
-           - 대상 도메인 목록: ${targetDomains}
         
         반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 부연적인 인삿말은 모두 생략하라.
         영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
@@ -225,7 +227,7 @@
         -. [상세하고 길게 작성된 개조식 본문 문장]
         기사 출처 : [순수 URL]`;
 
-        const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 기사를 정확히 3개만 솎아내어 출력하도록 집중하라.`;
+        const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 지정 도메인(${targetDomains})의 데이터 검색에 온전히 집중하여 기사를 정확히 3개만 추출하라.`;
 
         try {
             btn.innerText = `⏳ [0-${stage}단계 진행중] 공통지침 반영 및 최신 뉴스 3개 정밀 분석 중...`;
@@ -349,7 +351,7 @@
         return `https://www.google.com/search?q=${encodeURIComponent(query.trim())}`;
     }
 
-    document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.getRangeAt(0).insertNode(textNode); selection.collapseToEnd(); });
+    document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.collapseToEnd(); });
     
     function cleanUrl(url) { 
         if (!url) return "#"; 
