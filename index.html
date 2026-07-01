@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V65.8</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65.9</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -59,7 +59,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 65.8 (Advanced Engine - Grid Matrix Anti-Bug Patch)</div>
+    <div class="ver">Version 65.9 (Advanced Engine - Natural Text Wrapping Master)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
@@ -101,7 +101,9 @@
     
     <h3 class="section-title">Step 1. 통합 기사 확인 및 정제 (최대 10개 표시창)</h3>
     <div id="dropzone" contenteditable="true" placeholder="0단계의 복합 분할 추출 결과물들이 순서대로 이곳에 오차 없이 자동 정렬되어 누적 주입됩니다."></div>
-    <button class="primary-btn" onclick="parseArticles()">1단계: 통합 분석 및 제목 리스트 생성 🔍</button>
+    <div style="gap:10px; display:flex;">
+        <button class="primary-btn" onclick="parseArticles()">1단계: 통합 분석 및 제목 리스트 생성 🔍</button>
+    </div>
     
     <div id="selection-area" style="display:none; margin-top:20px;">
         <div class="config-panel">
@@ -461,33 +463,10 @@
             
             controls.innerHTML += ` <div class="size-control-card"> <strong style="color:#2c3e50; width:130px;">기사 ${displayIdx+1} 그림 크기:</strong>  <input type="range" min="150" max="600" value="${art.imgWidth}" oninput="updateSize(${idx}, this.value)" style="flex:1;"> <span id="val_${idx}" style="font-weight:bold; width:60px; color:${userTitleColor};">${art.imgWidth}px</span> </div>`; 
             
-            let blockBody = "";
-            if (art.imgData) {
-                const imgHtml = `<img src="${art.imgData}" width="100%" style="width:100%; height:auto; display:block; border-radius:10px; border:0;">`;
-                
-                // 🛡️ 아웃룩의 재배치 차단을 위해 물리적인 2단 바둑판 구조(table-layout:fixed) 강제 주입
-                if (align === 'left') {
-                    blockBody = `
-                    <table border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse; table-layout:fixed;">
-                        <tr>
-                            <td id="img_td_${idx}" width="${art.imgWidth}" valign="top" style="width:${art.imgWidth}px; padding-right:25px;">${imgHtml}</td>
-                            <td valign="top" style="font-family:'맑은 고딕',sans-serif; font-size:15px; color:#333333; line-height:1.7;">${art.contentHtml}</td>
-                        </tr>
-                    </table>`;
-                } else {
-                    blockBody = `
-                    <table border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse; table-layout:fixed;">
-                        <tr>
-                            <td valign="top" style="font-family:'맑은 고딕',sans-serif; font-size:15px; color:#333333; line-height:1.7; padding-right:25px;">${art.contentHtml}</td>
-                            <td id="img_td_${idx}" width="${art.imgWidth}" valign="top" style="width:${art.imgWidth}px; padding-left:25px;">${imgHtml}</td>
-                        </tr>
-                    </table>`;
-                }
-            } else {
-                blockBody = art.contentHtml;
-            }
+            // ⭐ [V65.9 핵심 변경점]: 아웃룩 버그를 유발하는 CSS float/inline-block을 빼고, 아웃룩이 신뢰하는 순수 HTML 'align' 속성과 충돌 없는 깨끗한 크기 지정을 결합
+            const imgTag = art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" align="${align}" style="width:${art.imgWidth}px; margin-${align === 'left' ? 'right' : 'left'}:25px; margin-bottom:10px; border-radius:10px;" border="0">` : "";
 
-            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${blockBody} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
+            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${imgTag} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
             displayIdx++; 
         }); 
         html += `</td></tr></table>`; 
@@ -498,14 +477,13 @@
     function updateSize(idx, val) { 
         window.articles[idx].imgWidth = val; 
         document.getElementById(`val_${idx}`).innerText = val + "px"; 
-        const td = document.getElementById(`img_td_${idx}`);
-        if(td) {
-            td.setAttribute('width', val);
-            td.style.width = val + "px";
-        }
+        const img = document.getElementById(`final_img_${idx}`); 
+        if(img) { 
+            img.style.width = val + "px"; 
+        } 
     }
     
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.8 바둑판 차단 패치 버전 복사가 완료되었습니다!"); }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.9 감싸기 완벽 마스터 버전 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
