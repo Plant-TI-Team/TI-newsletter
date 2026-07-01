@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V65.4</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65.5</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -59,7 +59,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 65.4 (Advanced Search Grounding Engine)</div>
+    <div class="ver">Version 65.5 (Advanced Search Grounding Engine - Outlook Resize Patch)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
@@ -183,19 +183,13 @@
         btn.disabled = true;
         
         const drop = document.getElementById('dropzone');
-        
-        // 🛠️ [실시간 날짜 동적 연산 도입] 매 요청 시점의 날짜를 동적으로 획득
         const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
-        const currentDay = now.getDate();
-        const formattedToday = `${currentYear}년 ${currentMonth}월 ${currentDay}일`;
+        const formattedToday = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
 
         let currentText = (stage === 1) ? "" : (drop.innerText || "");
         let matches = currentText.match(/기사\s*\d+\./g) || [];
         let baseCount = matches.length;
 
-        // 🛡️ [도메인 우선순위 철저 통제 설계 수립]
         const systemInstructionCommon = `너는 대우건설 Plant TI 팀의 뉴스레터 작성을 돕는 전문 AI 비서다. 
         
         📅 [중요: 실시간 날짜 동기화 및 타임라인 고정]
@@ -203,18 +197,16 @@
         - 너는 기존에 기억하고 있는 과거 내부 지식(Memory)을 절대 활용하지 마라. 반드시 제공된 구글 검색 도구(googleSearch)의 웹 브라우징 결과만 분석하여 가공해야 한다.
 
         🔒 [날짜 필터 및 최신성 가중치 규칙]
-        1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday}) 기준으로 역산하여 '지난 14일(2주) 이내'인 ${currentYear}년 ${currentMonth}월에 발행된 뉴스만 수집하라. 과거 연도의 철 지난 옛날 기사는 절대로 단 한 개도 가져오지 마라.
+        1. [엄격한 2주 컷오프]: 반드시 오늘 날짜(${formattedToday}) 기준으로 역산하여 '지난 14일(2주) 이내'인 2026년 5월에 발행된 뉴스만 수집하라. 과거 연도의 철 지난 옛날 기사는 절대로 단 한 개도 가져오지 마라.
         2. [최신성 우선순위]: 지난 2주 이내의 기사들 중에서도, 오늘 날짜인 ${formattedToday}에 가장 가까운 최신 기사일수록 가중치를 대단히 높게 두어 우선 선별하라.
-
-        🔒 [🚨 우선 타겟 도메인 검색 강제화 규칙 - 절대 타협 금지]
-        1. 너는 구글 검색(googleSearch)을 수행할 때 반드시 사용자가 지정한 도메인 목록(** ${targetDomains} **) 내에 실린 기사를 1순위로 탐색하여 출력해야 한다.
-        2. [사이트 타겟팅 쿼리화]: 검색 도구를 호출할 때 검색어에 지정 도메인 전용 한정 수식어(예: 'site:world-nuclear-news.org', 'site:iaea.org', 'site:nei.org' 등)를 명시적으로 결합하여 검색하라.
-        3. [외부 도메인 차단 장치]: 'world-nuclear-news.org' 등 지정 도메인에 훌륭하고 풍부한 정보가 존재함에도 불구하고, 'energy.gov' 등 외부 임의 사이트로 건너뛰어 기사를 채워 넣는 행동은 불성실한 가공 행위로 보아 불이익을 받는다.
-        4. [최후의 보루 규칙]: 지정된 전체 도메인을 이 잡듯 샅샅이 뒤져봤음에도 지난 2주 이내의 부합하는 기사가 '전무한' 불가피한 상황에서만 예외적으로 신뢰할 수 있는 외부 공공 에너지 기관 도메인의 검색과 수집을 허용한다. 이때도 무조건 지정된 도메인을 최우선으로 복원하려 노력해야 한다.
 
         🔒 [🚨 URL 무결성 지침]
         1. '기사 출처 :' 뒤에 적는 모든 URL 주소는 검색 결과에 나온 풀 주소(Full URL) 그대로 한 글자도 빠짐없이 완벽하게 출력하라.
         2. 중간에 자르거나 축약하지 말고 맨 뒤 파라미터까지 전부 끝까지 받아 적어야 한다.
+
+        🔒 [도메인 검색 가중치 원칙]
+        1. 너는 반드시 사용자가 제시한 아래 도메인 내부를 가장 먼저 탐색하여 뉴스를 선별해야 한다.
+           - 대상 도메인 목록: ${targetDomains}
         
         반드시 아래 [포맷] 규격을 준수하여 출력하고 서론 없이 '기사 1.'로 시작하라. 부연적인 인삿말은 모두 생략하라.
         영어 원문 제목은 추후 역추적 검색에 쓰이므로 '영어 원문 제목 :' 칸에 완벽한 오리지널 텍스트로 보존하라.
@@ -227,7 +219,7 @@
         -. [상세하고 길게 작성된 개조식 본문 문장]
         기사 출처 : [순수 URL]`;
 
-        const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 지정 도메인(${targetDomains})의 데이터 검색에 온전히 집중하여 기사를 정확히 3개만 추출하라.`;
+        const combinedPrompt = `${promptCommon}\n\n[이번 단계 개별 뉴스 타겟 지시사항]\n${promptStage}\n\n⚠️ 다른 지시와 무관하게 이번 요청에서는 반드시 기사를 정확히 3개만 솎아내어 출력하도록 집중하라.`;
 
         try {
             btn.innerText = `⏳ [0-${stage}단계 진행중] 공통지침 반영 및 최신 뉴스 3개 정밀 분석 중...`;
@@ -335,15 +327,13 @@
         return await response.json();
     }
 
-    // 🌐 [고도화 반영 패치] 구글 정밀 타겟 고급 연산자 조립기 구현
     function buildSearchUrl(title, source, date) {
-        let query = `"${title}"`; // 제목 완벽 일치 연산 장착
+        let query = `"${title}"`; 
         
-        // 출처 텍스트에서 도메인 추출 알고리즘 가동
         if (source && (source.includes('.') || source.includes('org') || source.includes('com'))) {
             let domain = source.replace(/https?:\/\/(www\.)?/, '').split('/')[0].trim();
             if (domain && !domain.includes(' ') && domain.length < 50) {
-                query += ` site:${domain}`; // 도메인 폐쇄 검색 연산 장착
+                query += ` site:${domain}`; 
             } else if (source.length < 30) {
                 query += ` "${source}"`;
             }
@@ -351,7 +341,7 @@
         return `https://www.google.com/search?q=${encodeURIComponent(query.trim())}`;
     }
 
-    document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.collapseToEnd(); });
+    document.getElementById('dropzone').addEventListener('paste', function(e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); const selection = window.getSelection(); if (!selection.rangeCount) return; selection.deleteFromDocument(); const textNode = document.createTextNode(text); selection.getRangeAt(0).insertNode(textNode); selection.collapseToEnd(); });
     
     function cleanUrl(url) { 
         if (!url) return "#"; 
@@ -395,13 +385,12 @@
                 }
             } 
 
-            // 주소가 유효하지 않거나 깨진 문자열이면 고도화된 연산자 조합 검색창 링크로 Fallback 빌드
             if (!url.startsWith("http")) {
                 url = buildSearchUrl(engTitle, source, date);
             }
             
             let contentLines = lines.slice(1); 
-            const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:::]\s*[\s\S]*/gi, /(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：][^\n]*/gi ]; 
+            const garbagePatterns = [ /기사\s*날짜\s*[:：][^\n]*/gi, /기사\s*출처\s*[:：]\s*[\s\S]*/gi, /(?:영어\s*원문\s*제목|영문\s*제목|원문\s*제목)\s*[:：][^\n]*/gi ]; 
             let contentText = contentLines.join('\n'); 
             garbagePatterns.forEach(p => contentText = contentText.replace(p, "")); 
             
@@ -427,7 +416,7 @@
         const list = document.getElementById('selection-list'); 
         list.innerHTML = ''; 
         
-        articles.forEach((art, idx) => { 
+        articles.forEach((art, idx) => {
             const isFallback = art.url.startsWith('https://www.google.com/search');
             const urlInputStyle = isFallback ? "flex: 1; padding: 6px; border: 2px solid #e67e22; border-radius: 4px; font-size: 13px; background-color: #fff5eb;" : "flex: 1; padding: 6px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px;";
             
@@ -441,7 +430,7 @@
                     
                     <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
                         <button class="btn-new-tab" onclick="openNewWindow(window.articles[${idx}].url)">기사 그림 가져오기 🔗</button>
-                        <button class="btn-new-tab" style="background-color: #e67e22;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent('&quot;' + window.articles[${idx}].engTitle + '&quot;'), '_blank')">제목 검색 🔍</button>
+                        <button class="btn-new-tab" style="background-color: #e67e22;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent(window.articles[${idx}].engTitle), '_blank')">제목 검색 🔍</button>
                         <input type="text" value="${art.url}" style="${urlInputStyle}" onchange="window.articles[${idx}].url = this.value" placeholder="진짜 주소를 찾아 여기에 붙여넣으세요">
                     </div>
                 </div>
@@ -470,7 +459,7 @@
             const bgColor = displayIdx % 2 === 0 ? "#ffffff" : "#ebf0f3"; 
             const borderColor = "#dce1e6"; 
             controls.innerHTML += ` <div class="size-control-card"> <strong style="color:#2c3e50; width:130px;">기사 ${displayIdx+1} 그림 크기:</strong>  <input type="range" min="150" max="600" value="${art.imgWidth}" oninput="updateSize(${idx}, this.value)" style="flex:1;"> <span id="val_${idx}" style="font-weight:bold; width:60px; color:${userTitleColor};">${art.imgWidth}px</span> </div>`; 
-            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" align="${align}" hspace="25" vspace="10" border="0" style="display:inline-block; border-radius:10px; margin-${align === 'left' ? 'right' : 'left'}:25px; height:auto;">` : ""} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
+            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" align="${align}" hspace="25" vspace="10" border="0" style="border-radius:10px; margin-${align === 'left' ? 'right' : 'left'}:25px;">` : ""} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
             displayIdx++; 
         }); 
         html += `</td></tr></table>`; 
@@ -478,8 +467,16 @@
         document.getElementById('final-section').style.display = 'block'; 
     }
     
-    function updateSize(idx, val) { window.articles[idx].imgWidth = val; document.getElementById(`val_${idx}`).innerText = val + "px"; const img = document.getElementById(`final_img_${idx}`); if(img) { img.setAttribute('width', val); img.style.width = val + "px"; img.style.height = "auto"; } }
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.4 어드밴스드 엔진 포맷 복사가 완료되었습니다!"); }
+    function updateSize(idx, val) { 
+        window.articles[idx].imgWidth = val; 
+        document.getElementById(`val_${idx}`).innerText = val + "px"; 
+        const img = document.getElementById(`final_img_${idx}`); 
+        if(img) { 
+            img.setAttribute('width', val); 
+        } 
+    }
+    
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.5 어드밴스드 엔진 포맷 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
