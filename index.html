@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Plant TI 뉴스레터 매직 빌더 V65.5</title>
+    <title>Plant TI 뉴스레터 매직 빌더 V65.6</title>
     <style>
         body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9; margin: 0; padding: 30px; color: #333; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -59,7 +59,7 @@
 <body>
 
 <div class="container">
-    <div class="ver">Version 65.5 (Advanced Search Grounding Engine - Outlook Resize Patch)</div>
+    <div class="ver">Version 65.6 (Advanced Search Grounding Engine - New Outlook Container Patch)</div>
     <h1>📧 Plant TI 뉴스레터 매직 빌더</h1>
     
     <h3 class="section-title" style="color:#00467F; border-color:#00467F;">Step 0. AI 기사 복합 생성 시스템 (3분할 최적화 패널) 🤖</h3>
@@ -459,7 +459,11 @@
             const bgColor = displayIdx % 2 === 0 ? "#ffffff" : "#ebf0f3"; 
             const borderColor = "#dce1e6"; 
             controls.innerHTML += ` <div class="size-control-card"> <strong style="color:#2c3e50; width:130px;">기사 ${displayIdx+1} 그림 크기:</strong>  <input type="range" min="150" max="600" value="${art.imgWidth}" oninput="updateSize(${idx}, this.value)" style="flex:1;"> <span id="val_${idx}" style="font-weight:bold; width:60px; color:${userTitleColor};">${art.imgWidth}px</span> </div>`; 
-            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${art.imgData ? `<img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" align="${align}" hspace="25" vspace="10" border="0" style="border-radius:10px; margin-${align === 'left' ? 'right' : 'left'}:25px;">` : ""} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
+            
+            // 🛡️ [뉴 아웃룩 강제 폭 격리 설계] 이미지가 커지지 않도록 완벽히 통제된 고정 폭 DIV 박스 주입
+            const imgBoxHtml = art.imgData ? `<div id="final_img_wrap_${idx}" style="float:${align}; width:${art.imgWidth}px; max-width:100%; margin-${align === 'left' ? 'right' : 'left'}:25px; margin-bottom:15px; display:inline-block; overflow:hidden;"><img id="final_img_${idx}" src="${art.imgData}" width="${art.imgWidth}" border="0" style="width:100% !important; max-width:100% !important; height:auto !important; display:block; border-radius:10px;"></div>` : "";
+
+            html += ` <div id="art_block_${idx}" style="background-color:${bgColor}; padding:45px 35px; border-bottom:1px solid ${borderColor}; overflow:hidden;"> <div style="margin-bottom:12px; display:block;"> <span style="font-size:23px; font-weight:bold; color:${userTitleColor} !important; -webkit-text-fill-color: ${userTitleColor} !important; line-height:1.3; font-family:'맑은 고딕',sans-serif;">기사 ${displayIdx+1}. ${art.title}</span> </div> <div style="margin-bottom:20px; display:block;"> <span style="font-size:14px; font-weight:bold; color:#7f8c8d !important; font-family:'맑은 고딕',sans-serif;">📅 ${art.date}</span> </div> <div style="text-align:justify; font-size:15px; color:#333333; line-height:1.8; font-family:'맑은 고딕',sans-serif; display:block;"> ${imgBoxHtml} ${art.contentHtml} <div style="margin-top:30px; clear:both; text-align:center; display:block;"> <table border="0" cellspacing="0" cellpadding="0" align="center"><tr><td align="center" bgcolor="${userBtnColor}" style="border-radius:5px; background-color:${userBtnColor};"> <a href="${art.url}" target="_blank" style="font-size:14px; font-weight:bold; color:${userBtnTextColor} !important; text-decoration:none; padding:8px 30px; display:inline-block; font-family:'맑은 고딕',sans-serif;"> <font color="${userBtnTextColor}"><span style="color:${userBtnTextColor} !important;">기사 원문 읽기 →</span></font> </a> </td></tr></table> </div> </div> </div>`; 
             displayIdx++; 
         }); 
         html += `</td></tr></table>`; 
@@ -471,12 +475,16 @@
         window.articles[idx].imgWidth = val; 
         document.getElementById(`val_${idx}`).innerText = val + "px"; 
         const img = document.getElementById(`final_img_${idx}`); 
+        const wrap = document.getElementById(`final_img_wrap_${idx}`); 
         if(img) { 
             img.setAttribute('width', val); 
-        } 
+        }
+        if(wrap) {
+            wrap.style.width = val + "px";
+        }
     }
     
-    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.5 어드밴스드 엔진 포맷 복사가 완료되었습니다!"); }
+    function copyToClipboard() { const range = document.createRange(); range.selectNodeContents(document.getElementById('outlook-result')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); alert("✅ V65.6 어드밴스드 엔진 포맷 복사가 완료되었습니다!"); }
     async function fetchBase64(url) { try { const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=jpg&w=800`; const response = await fetch(proxyUrl); const blob = await response.blob(); return new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); } catch (e) { return null; } }
 </script>
 </body>
